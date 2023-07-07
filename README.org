@@ -1,0 +1,6 @@
+* 本仓库是存储 . 文件的
+
+** 安装
+#+begin_src bash
+  
+#+end_src
