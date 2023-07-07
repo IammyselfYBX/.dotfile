@@ -2,7 +2,7 @@
 ** 安装系统
 *** Arch
 [[https://mp.weixin.qq.com/s/oWpgYLdgXJH7D8in1bL9ww][Arch的基础安装]] \\
-[[https://mp.weixin.qq.com/s/jXAvERqApp0dbVgtre9xNw][i3wm简单安装]] \\
+[[https://mp.weixin.qq.com/s/jXAvERqApp0dbVgtre9xNw][i3wm简单安装]] \\ 
 [[https://mp.weixin.qq.com/s/V25aM-aQCsG5jaXA6nzqRw][Arch桌面环境的必要安装]]
 
 *** Gentoo
@@ -42,4 +42,9 @@
   # 然后拷贝 ~/.xprofile 文件
   ibus-setup # 设置中文输入法
   ln -s ~/.dotfile/rime ~/.config/ibus/rime
+#+end_src
+
+*** zathura
+#+begin_src bash
+sudo pacman -S zathura zathura-pdf-mupdf
 #+end_src
