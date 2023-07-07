@@ -1,4 +1,12 @@
 * 本仓库是存储 . 文件的
+** 安装系统
+*** Arch
+[[https://mp.weixin.qq.com/s/oWpgYLdgXJH7D8in1bL9ww][Arch的基础安装]] \\
+[[https://mp.weixin.qq.com/s/jXAvERqApp0dbVgtre9xNw][i3wm简单安装]] \\
+[[https://mp.weixin.qq.com/s/V25aM-aQCsG5jaXA6nzqRw][Arch桌面环境的必要安装]]
+
+*** Gentoo
+[[https://www.bilibili.com/video/BV1ny4y1i7G6/][安装系统+软件]]
 
 ** 安装
 #+begin_src bash
