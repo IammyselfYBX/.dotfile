@@ -28,3 +28,10 @@
   ln -s ~/.dotfile/alacritty/ ~/.config/alacritty
 #+end_src
 
+*** ibus-rime
+#+begin_src bash
+  pacman -S ibus ibus-rime
+  # 然后拷贝 ~/.xprofile 文件
+  ibus-setup # 设置中文输入法
+  ln -s ~/.dotfile/rime ~/.config/ibus/rime
+#+end_src
