@@ -2,5 +2,29 @@
 
 ** 安装
 #+begin_src bash
-  
+  git clone git@github.com:IammyselfYBX/.dotfile.git
 #+end_src
+
+** 软件
+*** Xorg-server
+#+begin_src bash
+  # 安装
+  pacman -S xorg-server xorg-apps xorg-xinit
+  ln -s ~/.dotfile/xorg/Xmodmap ~/.Xmodmap # 设置键盘位置
+  ln -s ~/.dotfile/xorg/xprofile ~/.xprofile
+#+end_src
+
+*** i3
+#+begin_src bash
+  # 前提是安装好 Xorg-server
+  pacman -S i3-gaps i3status
+  ln -s ~/.dotfile/i3/ ~/.config/i3
+#+end_src
+
+
+*** alacritty
+#+begin_src bash
+  sudo pacman -S alacritty
+  ln -s ~/.dotfile/alacritty/ ~/.config/alacritty
+#+end_src
+
