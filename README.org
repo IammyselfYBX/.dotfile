@@ -46,5 +46,13 @@
 
 *** zathura
 #+begin_src bash
-sudo pacman -S zathura zathura-pdf-mupdf
+  sudo pacman -S zathura zathura-pdf-mupdf
+  ln -s ~/.dotfile/zathura ~/.config/zathura
+#+end_src
+
+*** latex
+#+begin_src bash
+  # 安装Texlive
+  # 然后拷贝 ~/.latexmkrc 文件
+  ln -s ~/.dotfile/latexmk/latexmkrc ~/.latexmkrc
 #+end_src
