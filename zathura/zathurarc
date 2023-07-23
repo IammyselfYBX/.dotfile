@@ -1,0 +1,17 @@
+set recolor true
+set recolor-darkcolor \#dcdccc
+set recolor-lightcolor \#1f1f1f
+set window-title-basename true
+
+set default-bg \#1c1c1c
+
+#set font "17"
+set window-width 800
+set window-height 1000
+
+# map o zoom out
+
+
+# make Zathura copy selected text to the system clipboard
+# https://unix.stackexchange.com/questions/339487/how-to-enable-copy-to-clipboard-with-zathura-pdf-poppler
+set selection-clipboard clipboard
