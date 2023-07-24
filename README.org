@@ -56,3 +56,14 @@
   # 然后拷贝 ~/.latexmkrc 文件
   ln -s ~/.dotfile/latexmk/latexmkrc ~/.latexmkrc
 #+end_src
+
+*** ranger
+#+begin_src bash
+  # 需要有一些依赖
+  sudo pacman -S imagemagick
+  sudo pacman -S ffmpegthumbnailer
+  sudo pacman -S perl-image-exiftool
+  sudo pacman -S ueberzug # 预览图片和视频
+  ln -s ~/.dotfile/ranger/ ~/.config/ranger
+  chmod +x ~/.config/ranger/scope.sh
+#+end_src
