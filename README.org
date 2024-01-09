@@ -53,6 +53,10 @@
 *** latex
 #+begin_src bash
   # 安装Texlive
+  ## 配置环境变量
+  export PATH=$PATH:/home/tony/.local/texlive2023/bin/x86_64-linux
+  export MANPATH=/home/tony/.local/texlive2023/texmf-dist/doc/man:$MANPATH
+  export INFOPATH=/home/tony/.local/texlive2023/texmf-dist/doc/info:$INFOPATH
   # 然后拷贝 ~/.latexmkrc 文件
   ln -s ~/.dotfile/latexmk/latexmkrc ~/.latexmkrc
 #+end_src
@@ -68,7 +72,18 @@
   chmod +x ~/.config/ranger/scope.sh
 #+end_src
 
+在 .bashrc 中配置
+#+begin_src bash
+export EDITOR=vim # 设置默认的编辑器
+#+end_src
+
+
 *** FZF
+#+begin_src bash
+  # 需要有一些依赖
+  sudo apt install fdclone # 用于忽略一些文件夹
+#+end_src
+
 在 .bashrc 中配置
 #+begin_src bash
 export FZF_COMPLETION_TRIGGER='~~'
@@ -80,6 +95,43 @@ export FZF_DEFAULT_OPTS="--reverse --height 95%  --preview '(highlight -O ansi {
 ## 忽略文件夹
 export FZF_DEFAULT_COMMAND="fd --exclude={.git,.idea,.vscode,.sass-cache,node_modules,build,.cache,.ccls-cache,.clangd} --type f"
 export FZF_COMPLETION_TRIGGER='**'
+#+end_src
+
+
+*** git
+在 .bashrc 中配置
+#+begin_src bash
+# 加载git 补全
+if [ -f ~/.config/git/git-completion.bash ];then
+    . ~/.config/git/git-completion.bash
+fi
+#+end_src
+
+
+*** 常用快捷键
+在 .bashrc 中配置
+#+begin_src bash
+alias cp="cp -i"                          # confirm before overwriting something
+alias df='df -h'                          # human-readable sizes
+alias free='free -m'                      # show sizes in MB
+alias np='vim PKGBUILD'
+#alias np='nano -w PKGBUILD'
+alias more=less
+alias vi=vim
+alias emacs="emacs -nw"
+alias gdb='gdb -q'
+alias e="emacs"
+alias l=ls
+alias la='ls -a'
+#+end_src
+
+
+*** 输入法
+在 .bashrc 中配置
+#+begin_src bash
+export GTK_IM_MODULE=ibus
+export XMODIFIERS=@im=ibus
+export QT_IM_MODULE=ibus
 #+end_src
 
 
