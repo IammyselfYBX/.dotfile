@@ -61,6 +61,11 @@
   ln -s ~/.dotfile/latexmk/latexmkrc ~/.latexmkrc
 #+end_src
 
+如果是Ububtu
+#+begin_src bash
+sudo apt-get install texlive-fonts-extra
+#+end_src
+
 *** ranger
 #+begin_src bash
   # 需要有一些依赖
