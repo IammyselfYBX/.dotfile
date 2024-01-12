@@ -64,6 +64,7 @@
 如果是Ububtu
 #+begin_src bash
 sudo apt-get install texlive-fonts-extra
+sudo apt install texlive-latex-extra
 #+end_src
 
 *** ranger
