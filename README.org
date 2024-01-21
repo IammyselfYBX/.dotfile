@@ -46,13 +46,21 @@
 
 *** zathura
 #+begin_src bash
-  sudo pacman -S zathura zathura-pdf-mupdf
-  ln -s ~/.dotfile/zathura ~/.config/zathura
+  sudo pacman -S zathura zathura-pdf-mupdf # Arch
+  sudo apt install  zathura                # ubuntu
+  mkdir -p ~/.config/zathura/
+   ln -s ~/.dotfile/zathura/zathura2 ~/.config/zathura/zathurarc
 #+end_src
 
 *** latex
 #+begin_src bash
   # 安装Texlive
+  ## 镜像安装
+  sudo mkdir /mnt/texlive2023
+  sudo mkdir /home/tony/.local/texlive2023
+  sudo mount -o loop texlive2023-20230313.iso /mnt/texlive2023
+  cd /mnt/texlive2023
+  sudo ./install-tl
   ## 配置环境变量
   export PATH=$PATH:/home/tony/.local/texlive2023/bin/x86_64-linux
   export MANPATH=/home/tony/.local/texlive2023/texmf-dist/doc/man:$MANPATH
