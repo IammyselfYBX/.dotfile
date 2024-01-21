@@ -36,7 +36,7 @@ $clean_ext = "";
 $bibtex_use = 2;
 
 # 设置 latex 文件输出的目录
-$out_dir = "Build";
+$out_dir = "build";
 
 # 设置预览模式，相当于 -pv 选项，在编译结束会开启预览
 # $view 设置预览的文件格式
