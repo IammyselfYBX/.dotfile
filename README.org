@@ -26,6 +26,11 @@
 #+begin_src bash
   # 前提是安装好 Xorg-server
   pacman -S i3-gaps i3status
+  # 必须安装 xbacklight
+  sudo emerge --ask xbacklight
+  sudo emerge --ask xmodmap
+
+  # 安装配置
   ln -s ~/.dotfile/i3/ ~/.config/i3
 #+end_src
 
