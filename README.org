@@ -62,10 +62,22 @@ sudo apt install i3status
 
 *** alacritty
 在安装alacritty之前需要安装字体
+**** Arch
 #+begin_src bash
   sudo pacman -S alacritty
   ln -s ~/.dotfile/alacritty/ ~/.config/alacritty
 #+end_src
+
+**** Ubuntu
+#+begin_src bash
+  sudo apt install alacritty
+  ln -s ~/.dotfile/alacritty/ ~/.config/alacritty
+
+  # 需要配置转换配置文件
+  # 将 yml 文件转换为 toml 文件
+  alacritty migrate
+#+end_src
+
 
 *** ibus-rime
 #+begin_src bash
