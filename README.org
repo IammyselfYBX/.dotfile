@@ -23,6 +23,31 @@
 #+end_src
 
 *** i3
+**** ubuntu
+
+#+begin_src bash
+# i3 安装程序启动器
+sudo apt install rofi
+
+# 安装必要的编译环境
+sudo apt install meson
+
+# 安装必要的依赖
+sudo apt install libpango1.0-dev libyajl-dev libstartup-notification0-dev libev-dev libtool libxkbcommon-dev libxkbcommon-x11-dev libxcb1-dev libxcb-randr0-dev libxcb-util0-dev libxcb-icccm4-dev libxcb-keysyms1-dev libxcb-cursor-dev libxcb-xinerama0-dev libxcb-xkb-dev libxcb-shape0-dev libxcb-xrm-dev xutils-dev
+
+# 编译安装
+cd ~/.application
+git clone GitHub - i3/i3: A tiling window manager for X11
+cd i3/
+mkdir -p build && cd build
+meson ..
+ninja
+
+# 安装状态栏
+sudo apt install i3status
+#+end_src
+
+**** Arch
 #+begin_src bash
   # 前提是安装好 Xorg-server
   pacman -S i3-gaps i3status
@@ -36,6 +61,7 @@
 
 
 *** alacritty
+在安装alacritty之前需要安装字体
 #+begin_src bash
   sudo pacman -S alacritty
   ln -s ~/.dotfile/alacritty/ ~/.config/alacritty
