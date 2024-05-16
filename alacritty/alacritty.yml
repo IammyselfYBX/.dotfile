@@ -153,22 +153,22 @@ font:
   # as modifying the line spacing, and `offset.x` as modifying the letter spacing.
   # offset：用于调整整个文本的水平（x）和垂直（y）偏移。
   # 这意味着整个终端的文本将根据这些值进行移动，可用于微调文本与窗口边缘的距离。
-  #offset:
-  #  x: 0
-  #  y: 0
+  offset:
+    x: 0
+    y: 0
 
   # Glyph offset determines the locations of the glyphs within their cells with
   # the default being at the bottom. Increasing `x` moves the glyph to the right,
   # increasing `y` moves the glyph upwards.
   # glyph_offset：用于调整单个字符的水平（x）和垂直（y）位置。
   # 这主要用于对齐某些特殊字体的视觉中心，改善字体在终端中的整体外观和可读性。
-  # glyph_offset:
-  #  x: 0
-  #  y: 0
-   fallback:
-    - family: 'SimSun'
-      weight: 500
-      style: Regular
+  glyph_offset:
+    x: 0
+    y: 0
+  # fallback:
+  #   - family: 'SimSun'
+  #     weight: 500
+  #     style: Regular
 
   # Thin stroke font rendering (macOS only)
   #
