@@ -1,0 +1,4 @@
+2020/07/15-13:45:52.620511 140647688300288 Log #547: 438 ops saved to Table #549 IO error: /home/tony/.config/ibus/rime/luna_pinyin.userdb/000549.ldb: No space left on device
+2020/07/15-13:45:52.620558 140647688300288 Log #547: ignoring conversion error: IO error: /home/tony/.config/ibus/rime/luna_pinyin.userdb/000549.ldb: No space left on device
+2020/07/15-13:45:52.620795 140647688300288 Archiving /home/tony/.config/ibus/rime/luna_pinyin.userdb/000547.log: NotFound: /home/tony/.config/ibus/rime/luna_pinyin.userdb/000547.log: No such file or directory
+2020/07/15-13:45:52.622188 140647688300288 Table #548: 2258 entries OK

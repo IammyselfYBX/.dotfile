@@ -16,7 +16,7 @@ patch:
     - schema: wubi86_jidian_pinyin      # 86五笔双拼
     - schema: wubi86_jidian_trad        # 86五笔繁体
     - schema: wubi86_jidian_trad_pinyin # 86五笔双拼繁体
-  menu/page_size: 5       #候选词数
+  menu/page_size: 7       #候选词数
   style/horizontal: true  # 候选窗水平显示
 
 
