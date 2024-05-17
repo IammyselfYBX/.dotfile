@@ -119,6 +119,7 @@ sudo apt install texlive-latex-extra
 #+end_src
 
 *** ranger
+**** Arch
 #+begin_src bash
   # 需要有一些依赖
   sudo pacman -S imagemagick
@@ -128,6 +129,12 @@ sudo apt install texlive-latex-extra
   ln -s ~/.dotfile/ranger/ ~/.config/ranger
   chmod +x ~/.config/ranger/scope.sh
 #+end_src
+
+**** Ububtu
+#+begin_src bash
+  sudo apt install ranger
+#+end_src
+
 
 在 .bashrc 中配置
 #+begin_src bash
