@@ -1,5 +1,0 @@
-2024/05/17-08:25:36.699297 139858051942080 Log #2358: 0 ops saved to Table #2359 OK
-2024/05/17-08:25:36.699495 139858051942080 Archiving /home/tony/.config/ibus/rime/luna_pinyin.userdb/002358.log: OK
-2024/05/17-08:25:36.704971 139858051942080 Table #2349: 25939 entries OK
-2024/05/17-08:25:36.705063 139858051942080 Archiving /home/tony/.config/ibus/rime/luna_pinyin.userdb/MANIFEST-002357: OK
-2024/05/17-08:25:36.707549 139858051942080 **** Repaired leveldb /home/tony/.config/ibus/rime/luna_pinyin.userdb; recovered 1 files; 804418 bytes. Some data may have been lost. ****

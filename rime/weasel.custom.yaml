@@ -9,7 +9,7 @@ app_options:
 
 style:
   color_scheme: so_young
-  font_face: Microsoft YaHei
+  font_face: SimHei
   font_point: 14
   horizontal: true
   fullscreen: false
