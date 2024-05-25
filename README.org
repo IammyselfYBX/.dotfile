@@ -45,6 +45,10 @@ ninja
 
 # 安装状态栏
 sudo apt install i3status
+
+# 安装透明效果completon    
+sudo apt install compton
+ln -s ~/.dotfile/compton/compton ~/.config/compton/compton
 #+end_src
 
 **** Arch
