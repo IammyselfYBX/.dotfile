@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Qt Creator
+GenericName=C++ IDE for developing Qt applications
+X-KDE-StartupNotify=true
+Exec=/opt/qtcreator-4.4.1/bin/qtcreator
+Icon=/opt/qtcreator-4.4.1/QtProject-qtcreator
+Terminal=false
+Categories=Development;IDE;Qt;
