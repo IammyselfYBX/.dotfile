@@ -112,9 +112,30 @@ ln -s ~/.dotfile/compton/compton ~/.config/compton/compton
   export PATH=$PATH:/home/tony/.local/texlive2023/bin/x86_64-linux
   export MANPATH=/home/tony/.local/texlive2023/texmf-dist/doc/man:$MANPATH
   export INFOPATH=/home/tony/.local/texlive2023/texmf-dist/doc/info:$INFOPATH
-  alias texcheck='xelatex -syntax-only main.tex'
   # 然后拷贝 ~/.latexmkrc 文件
   ln -s ~/.dotfile/latexmk/latexmkrc ~/.latexmkrc
+#+end_src
+latex语法检查
+#+begin_src bash
+$> emacs ~/.bashrc
+# 定义一个函数来执行xelatex语法检查，并将中间文件放到check文件夹中  
+function texcheck() {  
+  # 定义主tex文件的名称（这里可以修改为其他文件名，如果需要的话）  
+  local TEX_FILE="main.tex"  
+    
+  # 定义检查文件夹的名称  
+  local CHECK_FOLDER="check"  
+    
+  # 检查检查文件夹是否存在，如果不存在则创建  
+  if [ ! -d "$CHECK_FOLDER" ]; then  
+    mkdir "$CHECK_FOLDER"  
+  fi  
+    
+  # 执行xelatex命令进行语法检查，并将中间文件重定向到检查文件夹  
+  xelatex -syntax-only -output-directory="$CHECK_FOLDER" "$TEX_FILE"  
+}  
+# 定义别名texcheck来调用上述函数  
+alias texcheck='texcheck'
 #+end_src
 
 如果是Ububtu
