@@ -112,6 +112,7 @@ ln -s ~/.dotfile/compton/compton ~/.config/compton/compton
   export PATH=$PATH:/home/tony/.local/texlive2023/bin/x86_64-linux
   export MANPATH=/home/tony/.local/texlive2023/texmf-dist/doc/man:$MANPATH
   export INFOPATH=/home/tony/.local/texlive2023/texmf-dist/doc/info:$INFOPATH
+  alias texcheck='xelatex -syntax-only main.tex'
   # 然后拷贝 ~/.latexmkrc 文件
   ln -s ~/.dotfile/latexmk/latexmkrc ~/.latexmkrc
 #+end_src
