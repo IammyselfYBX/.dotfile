@@ -194,8 +194,8 @@ mode "resize" {
 #}
 
 # backgrounds and dual-monitor hotplug handling
-exec_always --no-startup-id /home/tony/.config/i3/scripts/dual-display.sh
-#exec --no-startup-id compton -b 
+exec_always --no-startup-id $HOME/.config/i3/scripts/dual-display.sh
+#exec --no-startup-id compton -b
 # 关闭compton半透明
 #exec --no-startup-id compton --conf ~/.config/compton/compton
 
@@ -209,9 +209,9 @@ bindsym $mod+minus scratchpad show
 
 # window config
 # for_window [class="^.*"] border pixel 4
-gaps inner 12px    
+gaps inner 12px
 # 窗口边框
-new_window 1pixel 
+new_window 1pixel
 # 不想看i3窗口的上面的蓝色的栏
 # new_float 1pixel
 ## Only enable gaps on a workspace when there is at least one container
@@ -228,23 +228,24 @@ exec --no-startup-id ibus-daemon --xim -d -r
 exec_always --no-startup-id /bin/sh ~/.config/i3/scripts/tap-to-click.sh
 exec_always --no-startup-id /bin/sh ~/.config/i3/scripts/inverse-scroll.sh
 # exec_always --no-startup-id /bin/gthumb /home/tony/Pictures/课表.png
- exec_always --no-startup-id /bin/gnome-todo
+# Optional application launcher; enable only after installing gnome-todo.
+# exec_always --no-startup-id gnome-todo
 
 # ranger
 bindsym $mod+Shift+t exec alacritty -e ranger
 
 # screenshot
-## cut all the screen 
+## cut all the screen
 bindsym --release Print exec "/bin/sh ~/.config/i3/screenshot/cut_all.sh"
 ## cut current window
 bindsym --release $mod+Shift+Print exec "/bin/sh ~/.config/i3/screenshot/cut_cur.sh"
-## cut selection 
+## cut selection
 bindsym --release $mod+Print exec "/bin/sh ~/.config/i3/screenshot/cut_sel.sh"
 
 # Screen bright
 # sudo chmod 666 /sys/class/backlight/intel_backlight/brightness
-bindsym XF86MonBrightnessUp exec "xbacklight -inc 10" 
-bindsym XF86MonBrightnessDown exec "xbacklight -dec 10" 
+bindsym XF86MonBrightnessUp exec "xbacklight -inc 10"
+bindsym XF86MonBrightnessDown exec "xbacklight -dec 10"
 
 
 # for sound control
@@ -265,7 +266,7 @@ bindsym XF86AudioMute exec amixer set Master toggle
 bindsym $mod+x exec "betterlockscreen -u ~/.config/i3/lock/ante.jpg -l -b 1 dim"
 
 # 立即关闭屏幕
-bindsym ctrl+Shift+l exec "/home/tony/.local/bin/screen_off" 
+bindsym ctrl+Shift+l exec "$HOME/.local/bin/screen_off"
 
 # 常用应用的快捷键
 bindsym $mod+c exec chromium
@@ -273,14 +274,3 @@ bindsym $mod+c exec chromium
 
 # 使用polybar
 exec_always --no-startup-id $HOME/.config/polybar/launch.sh
-
-
-
-
-
-
-
-
-
-
-

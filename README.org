@@ -1,265 +1,56 @@
-* 本仓库是存储 . 文件的
-** 安装系统
-*** Arch
-[[https://mp.weixin.qq.com/s/oWpgYLdgXJH7D8in1bL9ww][Arch的基础安装]] \\
-[[https://mp.weixin.qq.com/s/jXAvERqApp0dbVgtre9xNw][i3wm简单安装]] \\ 
-[[https://mp.weixin.qq.com/s/V25aM-aQCsG5jaXA6nzqRw][Arch桌面环境的必要安装]]
+* Dotfiles 配置仓库
+本仓库统一管理个人 Linux 桌面配置。家目录中的配置文件通过软链接指向本仓库，因此直接修改家目录中的配置，实际修改的就是仓库文件。
 
-*** Gentoo
-[[https://www.bilibili.com/video/BV1ny4y1i7G6/][安装系统+软件]]
-
-** 安装
-#+begin_src bash
-  git clone git@github.com:IammyselfYBX/.dotfile.git
-#+end_src
-
-** 统一关联配置（推荐）
-先把仓库放在固定位置：
+** 安装与关联
 #+begin_src bash
   git clone git@github.com:IammyselfYBX/.dotfile.git ~/.dotfile
   cd ~/.dotfile
+  ./link.sh --dry-run
+  ./link.sh
 #+end_src
 
-运行链接脚本：
-#+begin_src bash
-  ./link.sh --dry-run  # 预览将要创建或备份的路径
-  ./link.sh            # 正式建立链接
-#+end_src
+=link.sh= 会在建立链接前把已有配置备份到 =~/.dotfile-backups/<时间戳>/=。
 
-脚本会把已经存在的配置移动到
-=~/.dotfile-backups/<时间戳>/=，再把下面的路径链接到仓库：
+** 配置目录
+| 目录 | 内容 | 说明 |
+|------+------+------|
+| =i3/= | i3、Polybar 启动、截图、双屏、锁屏 | [[file:i3/README.md][i3 文档]] |
+| =alacritty/= | Alacritty 终端配置 | [[file:alacritty/README.md][Alacritty 文档]] |
+| =compton/= | Compton 窗口合成器配置 | [[file:compton/README.md][Compton 文档]] |
+| =gnome/= | GNOME/Qt Creator 桌面启动器 | [[file:gnome/README.md][桌面图标文档]] |
+| =latexmk/= | LaTeX 编译与语法检查 | [[file:latexmk/README.md][latexmk 文档]] |
+| =ranger/= | Ranger 文件管理器 | [[file:ranger/README.md][Ranger 文档]] |
+| =rime/= | IBus Rime 输入法 | [[file:rime/README.md][Rime 文档]] |
+| =xorg/= | Xmodmap 和 Xprofile | [[file:xorg/README.md][Xorg 文档]] |
+| =zathura/= | Zathura PDF 阅读器 | [[file:zathura/README.md][Zathura 文档]] |
 
-| 仓库路径 | 家目录链接 |
-|----------+------------|
-| =xorg/Xmodmap= | =~/.Xmodmap= |
-| =xorg/xprofile= | =~/.xprofile= |
-| =i3/= | =~/.config/i3= |
-| =alacritty/= | =~/.config/alacritty= |
-| =compton/compton= | =~/.config/compton/compton= |
-| =rime/= | =~/.config/ibus/rime= |
-| =ranger/= | =~/.config/ranger= |
-| =zathura/zathurarc= | =~/.config/zathura/zathurarc= |
-| =latexmk/latexmkrc= | =~/.latexmkrc= |
-
-之后直接编辑家目录中的配置，实际修改的就是本仓库。同步时执行：
+** 同步配置
+首次使用或切换电脑时先拉取：
 #+begin_src bash
   cd ~/.dotfile
   git pull --ff-only
+#+end_src
+
+修改配置后提交并推送：
+#+begin_src bash
+  cd ~/.dotfile
   git add -A
   git commit -m "Update dotfiles"
   git push
 #+end_src
 
-** 软件
-*** Xorg-server
-#+begin_src bash
-  # 安装
-  pacman -S xorg-server xorg-apps xorg-xinit
-  ln -s ~/.dotfile/xorg/Xmodmap ~/.Xmodmap # 设置键盘位置
-  ln -s ~/.dotfile/xorg/xprofile ~/.xprofile
-#+end_src
+** 生成文件
+以下内容属于运行时数据，不进入版本管理：
+- =rime/build/=
+- =rime/sync/=
+- Rime 的 =*.userdb= 数据
+- Python =__pycache__=
 
-*** i3
-**** ubuntu
+** 系统安装参考
+*** Arch
+- [[https://mp.weixin.qq.com/s/oWpgYLdgXJH7D8in1bL9ww][Arch 基础安装]]
+- [[https://mp.weixin.qq.com/s/jXAvERqApp0dbVgtre9xNw][i3wm 简单安装]]
+- [[https://mp.weixin.qq.com/s/V25aM-aQCsG5jaXA6nzqRw][Arch 桌面环境必要安装]]
 
-#+begin_src bash
-# i3 安装程序启动器
-sudo apt install rofi
-
-# 安装必要的编译环境
-sudo apt install meson
-
-# 安装必要的依赖
-sudo apt install libpango1.0-dev libyajl-dev libstartup-notification0-dev libev-dev libtool libxkbcommon-dev libxkbcommon-x11-dev libxcb1-dev libxcb-randr0-dev libxcb-util0-dev libxcb-icccm4-dev libxcb-keysyms1-dev libxcb-cursor-dev libxcb-xinerama0-dev libxcb-xkb-dev libxcb-shape0-dev libxcb-xrm-dev xutils-dev
-
-# 编译安装
-cd ~/.application
-git clone GitHub - i3/i3: A tiling window manager for X11
-cd i3/
-mkdir -p build && cd build
-meson ..
-ninja
-
-# 安装状态栏
-sudo apt install i3status
-
-# 安装透明效果completon    
-sudo apt install compton
-ln -s ~/.dotfile/compton/compton ~/.config/compton/compton
-#+end_src
-
-**** Arch
-#+begin_src bash
-  # 前提是安装好 Xorg-server
-  pacman -S i3-gaps i3status
-  # 必须安装 xbacklight
-  sudo emerge --ask xbacklight
-  sudo emerge --ask xmodmap
-
-  # 安装配置
-  ln -s ~/.dotfile/i3/ ~/.config/i3
-#+end_src
-
-
-*** alacritty
-在安装alacritty之前需要安装字体
-**** Arch
-#+begin_src bash
-  sudo pacman -S alacritty
-  ln -s ~/.dotfile/alacritty/ ~/.config/alacritty
-#+end_src
-
-**** Ubuntu
-#+begin_src bash
-  sudo apt install alacritty
-  ln -s ~/.dotfile/alacritty/ ~/.config/alacritty
-
-  # 需要配置转换配置文件
-  # 将 yml 文件转换为 toml 文件
-  alacritty migrate
-#+end_src
-
-
-*** ibus-rime
-#+begin_src bash
-  pacman -S ibus ibus-rime
-  # 然后拷贝 ~/.xprofile 文件
-  ibus-setup # 设置中文输入法
-  ln -s ~/.dotfile/rime ~/.config/ibus/rime
-#+end_src
-
-*** zathura
-#+begin_src bash
-  sudo pacman -S zathura zathura-pdf-mupdf # Arch
-  sudo apt install  zathura                # ubuntu
-  mkdir -p ~/.config/zathura/
-   ln -s ~/.dotfile/zathura/zathurarc ~/.config/zathura/zathurarc
-#+end_src
-
-*** latex
-#+begin_src bash
-  # 安装Texlive
-  ## 镜像安装
-  sudo mkdir /mnt/texlive2023
-  sudo mkdir /home/tony/.local/texlive2023
-  sudo mount -o loop texlive2023-20230313.iso /mnt/texlive2023
-  cd /mnt/texlive2023
-  sudo ./install-tl
-  ## 配置环境变量
-  export PATH=$PATH:/home/tony/.local/texlive2023/bin/x86_64-linux
-  export MANPATH=/home/tony/.local/texlive2023/texmf-dist/doc/man:$MANPATH
-  export INFOPATH=/home/tony/.local/texlive2023/texmf-dist/doc/info:$INFOPATH
-  # 然后拷贝 ~/.latexmkrc 文件
-  ln -s ~/.dotfile/latexmk/latexmkrc ~/.latexmkrc
-#+end_src
-latex语法检查
-#+begin_src bash
-$> emacs ~/.bashrc
-# 定义一个函数来执行xelatex语法检查，并将中间文件放到check文件夹中  
-function texcheck() {  
-  # 定义主tex文件的名称（这里可以修改为其他文件名，如果需要的话）  
-  local TEX_FILE="main.tex"  
-    
-  # 定义检查文件夹的名称  
-  local CHECK_FOLDER="check"  
-    
-  # 检查检查文件夹是否存在，如果不存在则创建  
-  if [ ! -d "$CHECK_FOLDER" ]; then  
-    mkdir "$CHECK_FOLDER"  
-  fi  
-    
-  # 执行xelatex命令进行语法检查，并将中间文件重定向到检查文件夹  
-  xelatex -syntax-only -output-directory="$CHECK_FOLDER" "$TEX_FILE"  
-}  
-# 定义别名texcheck来调用上述函数  
-alias texcheck='texcheck'
-#+end_src
-
-如果是Ububtu
-#+begin_src bash
-sudo apt install texlive-full
-sudo apt-get install texlive-fonts-extra
-sudo apt install texlive-latex-extra 
-#+end_src
-
-*** ranger
-**** Arch
-#+begin_src bash
-  # 需要有一些依赖
-  sudo pacman -S imagemagick
-  sudo pacman -S ffmpegthumbnailer
-  sudo pacman -S perl-image-exiftool
-  sudo pacman -S ueberzug # 预览图片和视频
-  ln -s ~/.dotfile/ranger/ ~/.config/ranger
-  chmod +x ~/.config/ranger/scope.sh
-#+end_src
-
-**** Ububtu
-#+begin_src bash
-  sudo apt install ranger
-#+end_src
-
-
-在 .bashrc 中配置
-#+begin_src bash
-export EDITOR=vim # 设置默认的编辑器
-#+end_src
-
-
-*** FZF
-#+begin_src bash
-  # 需要有一些依赖
-  sudo apt install fdclone # 用于忽略一些文件夹
-#+end_src
-
-在 .bashrc 中配置
-#+begin_src bash
-export FZF_COMPLETION_TRIGGER='~~'
-##export FZF_COMPLETION_TRIGGER='**'
-## 界面展示 
-##export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --preview '(highlight -O ansi {} || cat {}) 2> /dev/null | head -500'"
-export FZF_DEFAULT_OPTS="--reverse --height 95%  --preview '(highlight -O ansi {} || cat {}) 2> /dev/null | head -500'"
-## 需要安装fd
-## 忽略文件夹
-export FZF_DEFAULT_COMMAND="fd --exclude={.git,.idea,.vscode,.sass-cache,node_modules,build,.cache,.ccls-cache,.clangd} --type f"
-export FZF_COMPLETION_TRIGGER='**'
-#+end_src
-
-
-*** git
-在 .bashrc 中配置
-#+begin_src bash
-# 加载git 补全
-if [ -f ~/.config/git/git-completion.bash ];then
-    . ~/.config/git/git-completion.bash
-fi
-#+end_src
-
-
-*** 常用快捷键
-在 .bashrc 中配置
-#+begin_src bash
-alias cp="cp -i"                          # confirm before overwriting something
-alias df='df -h'                          # human-readable sizes
-alias free='free -m'                      # show sizes in MB
-alias np='vim PKGBUILD'
-#alias np='nano -w PKGBUILD'
-alias more=less
-alias vi=vim
-alias emacs="emacs -nw"
-alias gdb='gdb -q'
-alias e="emacs"
-alias l=ls
-alias la='ls -a'
-#+end_src
-
-
-*** 输入法
-在 .bashrc 中配置
-#+begin_src bash
-export GTK_IM_MODULE=ibus
-export XMODIFIERS=@im=ibus
-export QT_IM_MODULE=ibus
-#+end_src
-
-
+*** Gentoo
+- [[https://www.bilibili.com/video/BV1ny4y1i7G6/][安装系统与软件]]
