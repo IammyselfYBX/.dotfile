@@ -10,3 +10,5 @@ rime/*.userdb/
 rime/*.userdb.old/
 rime/*.userdb.txt
 rime/*.lock
+rime/user.yaml
+rime/backup-*/
