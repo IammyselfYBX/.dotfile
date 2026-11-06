@@ -21,7 +21,7 @@ Arch/Manjaro：
 
 ```bash
 sudo pacman -S --needed \
-  i3-wm i3status feh polybar alacritty dmenu \
+  i3-wm i3status feh polybar alacritty dmenu maim slop \
   xorg-xrandr xorg-xbacklight xorg-xmodmap xorg-xinput \
   scrot xclip imagemagick bc xorg-xdpyinfo chromium ranger
 ```
@@ -37,7 +37,7 @@ sudo pacman -S --needed compton i3lock
 Ubuntu/Debian：
 
 ```bash
-sudo apt install i3-wm i3status i3lock feh polybar alacritty \
+sudo apt install i3-wm i3status i3lock feh polybar alacritty maim slop \
   dmenu x11-xserver-utils xinput scrot xclip imagemagick bc x11-utils chromium ranger
 ```
 
@@ -77,24 +77,32 @@ i3-msg restart
 
 | 快捷键 | 功能 |
 | --- | --- |
-| `Mod+Enter` | Alacritty |
+| `Mod+Enter` | WezTerm |
 | `Mod+D` | dmenu |
 | `Mod+Shift+R` | 重载 i3 |
 | `Print` | 全屏截图 |
-| `Mod+Print` | 选区截图 |
+| `Mod+Shift+S` | 选区截图并只复制到剪贴板 |
+| `Mod+Print` | 选区截图并保存 |
 | `Mod+Shift+Print` | 当前窗口截图 |
 | `Mod+Shift+T` | Ranger |
 | `Mod+Shift+D` | 选择外接屏位置 |
-| `Mod+X` | Betterlockscreen |
+| `Mod+L` | 壁纸锁屏 |
 | `Ctrl+Shift+L` | 关闭屏幕 |
 | `Mod+C` | Chromium |
 
 ## 截图
 
-截图保存在 `~/Pictures/`，同时复制到剪贴板。依赖：
+- `Print`：全屏截图，保存到 `~/Pictures/`，同时复制到剪贴板
+- `Mod+Shift+Print`：当前窗口截图，保存到 `~/Pictures/`，同时复制到剪贴板
+- `Mod+Print`：选区截图，保存到 `~/Pictures/`，同时复制到剪贴板
+- `Mod+Shift+S`：选区截图，只复制到剪贴板，不保留图片文件
 
-- `scrot`
+依赖：
+
+- `scrot`（保存式截图）
+- `maim`、`slop`（选区截图）
 - `xclip`
+- `notify-send`（可选，用于复制成功提示）
 
 ## 双屏处理
 

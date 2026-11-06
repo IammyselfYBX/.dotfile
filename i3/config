@@ -241,8 +241,10 @@ bindsym $mod+Shift+t exec alacritty -e ranger
 bindsym --release Print exec "/bin/sh ~/.config/i3/screenshot/cut_all.sh"
 ## cut current window
 bindsym --release $mod+Shift+Print exec "/bin/sh ~/.config/i3/screenshot/cut_cur.sh"
-## cut selection
+## cut selection and save to Pictures
 bindsym --release $mod+Print exec "/bin/sh ~/.config/i3/screenshot/cut_sel.sh"
+## Windows-like region capture: clipboard only, no saved file
+bindsym --release $mod+Shift+s exec --no-startup-id "$HOME/.config/i3/screenshot/cut_sel_clipboard.sh"
 
 # Screen bright
 # sudo chmod 666 /sys/class/backlight/intel_backlight/brightness
