@@ -29,13 +29,13 @@ case "$EXTERNAL_POSITION" in
 esac
 
 exec 9>"$LOCK_FILE"
-if ! flock -n 9; then
+if ! flock -w 5 9; then
     exit 0
 fi
 
 xrandr_state() {
     xrandr --query 2>/dev/null \
-        | awk '/ connected/ || / disconnected/ { print $1, $2, $3 }' \
+        | awk '/ connected/ || / disconnected/ { print $1, $2, $3, $4 }' \
         | cksum
 }
 

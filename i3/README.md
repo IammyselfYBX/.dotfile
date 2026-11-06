@@ -104,12 +104,12 @@ i3-msg restart
 ~/.config/i3/dual-display.conf
 ```
 
-默认内容：
+脚本内置默认值是 `right`。当前仓库配置为 `above`：
 
 ```bash
 INTERNAL_OUTPUT="eDP-1"
 EXTERNAL_OUTPUT="HDMI-1"
-EXTERNAL_POSITION="right"
+EXTERNAL_POSITION="above"
 ```
 
 `EXTERNAL_POSITION` 支持：
@@ -121,15 +121,17 @@ EXTERNAL_POSITION="right"
 | `above` | 内屏上方 | 从内屏上边缘移到外屏 |
 | `below` | 内屏下方 | 从内屏下边缘移到外屏 |
 
-例如外接屏放在上方：
+例如改回右侧：
 
 ```bash
-sed -i 's/^EXTERNAL_POSITION=.*/EXTERNAL_POSITION="above"/' \
+sed -i 's/^EXTERNAL_POSITION=.*/EXTERNAL_POSITION="right"/' \
   ~/.config/i3/dual-display.conf
 
 pkill -f '^bash .*dual-display.sh$' || true
 i3-msg 'exec --no-startup-id $HOME/.config/i3/scripts/dual-display.sh'
 ```
+
+监听脚本会等待旧进程释放锁，再按新配置重新应用布局。
 
 也可以直接手动测试：
 
