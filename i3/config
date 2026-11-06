@@ -20,14 +20,9 @@ font pango:monospace 8
 # text rendering and scalability on retina/hidpi displays (thanks to pango).
 #font pango:DejaVu Sans Mono 8
 
-# The combination of xss-lock, nm-applet and pactl is a popular choice, so
-# they are included here as an example. Modify as you see fit.
-
-# xss-lock grabs a logind suspend inhibit lock and will use i3lock to lock the
-# screen before suspend. Use loginctl lock-session to lock your screen.
-# 空闲 10 分钟后启动壁纸锁屏；脚本和图片都在 ~/.config/i3 下
-exec --no-startup-id xset s 600 600
-exec --no-startup-id xss-lock --transfer-sleep-lock -- $HOME/.config/i3/lock/lock-screen.sh
+# 不进行空闲熄屏或自动锁屏。
+# 只有 Mod+L 才会手动进入壁纸锁屏；Ctrl+Shift+L 可手动关闭屏幕。
+exec --no-startup-id xset s off -dpms
 
 # NetworkManager is the most popular way to manage wireless networks on Linux,
 # and nm-applet is a desktop environment-independent system tray GUI for it.

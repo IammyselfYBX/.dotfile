@@ -21,7 +21,7 @@ Arch/Manjaro：
 
 ```bash
 sudo pacman -S --needed \
-  i3-wm i3status xss-lock feh polybar alacritty dmenu \
+  i3-wm i3status feh polybar alacritty dmenu \
   xorg-xrandr xorg-xbacklight xorg-xmodmap xorg-xinput \
   scrot xclip imagemagick bc xorg-xdpyinfo chromium ranger
 ```
@@ -32,12 +32,12 @@ sudo pacman -S --needed \
 sudo pacman -S --needed compton i3lock
 ```
 
-`betterlockscreen` 还需要 `i3lock-color`、ImageMagick、`xdpyinfo`、`xrandr`、`bc` 和 `feh`。`i3lock-color` 在部分发行版中位于 AUR。
+壁纸锁屏使用 `i3lock-color`；在部分发行版中该包位于 AUR。
 
 Ubuntu/Debian：
 
 ```bash
-sudo apt install i3-wm i3status i3lock xss-lock feh polybar alacritty \
+sudo apt install i3-wm i3status i3lock feh polybar alacritty \
   dmenu x11-xserver-utils xinput scrot xclip imagemagick bc x11-utils chromium ranger
 ```
 
@@ -202,10 +202,15 @@ xrandr --output HDMI-1 --off
 
 ## 锁屏和关闭屏幕
 
+默认不自动锁屏，也不会因为空闲而熄屏。只有手动操作才会锁屏或关闭屏幕。
+
 锁屏脚本的源文件位于 `~/.config/i3/lock/lock-screen.sh`，`install.sh` 会将它链接到 `~/.local/bin/lock-screen`。
 
 ```bash
+# 手动锁屏，快捷键 Mod+L
 ~/.local/bin/lock-screen
+
+# 手动关闭屏幕，快捷键 Ctrl+Shift+L
 ~/.local/bin/screen_off
 ```
 
