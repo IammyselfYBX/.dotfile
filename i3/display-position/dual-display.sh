@@ -2,8 +2,11 @@
 # Keep the built-in display and the native HDMI output arranged as one desktop.
 set -u
 
-WALLPAPER="$HOME/.config/i3/backgrounds/little.png"
-CONFIG_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/i3/dual-display.conf"
+CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+I3_DIR="$CONFIG_HOME/i3"
+DISPLAY_POSITION_DIR="$I3_DIR/display-position"
+WALLPAPER="$I3_DIR/backgrounds/little.png"
+CONFIG_FILE="$DISPLAY_POSITION_DIR/dual-display.conf"
 RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp}"
 LOCK_FILE="$RUNTIME_DIR/i3-dual-display-${UID}.lock"
 

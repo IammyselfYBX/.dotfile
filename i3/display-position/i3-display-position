@@ -2,9 +2,12 @@
 # Change the external display position, persist it, and apply it immediately.
 set -euo pipefail
 
-CONFIG_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/i3/dual-display.conf"
-WATCHER="$HOME/.config/i3/scripts/dual-display.sh"
-WALLPAPER="$HOME/.config/i3/backgrounds/little.png"
+CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+I3_DIR="$CONFIG_HOME/i3"
+DISPLAY_POSITION_DIR="$I3_DIR/display-position"
+CONFIG_FILE="$DISPLAY_POSITION_DIR/dual-display.conf"
+WATCHER="$DISPLAY_POSITION_DIR/dual-display.sh"
+WALLPAPER="$I3_DIR/backgrounds/little.png"
 VALID_POSITIONS="right above left below"
 
 usage() {
@@ -17,7 +20,7 @@ Usage:
   i3-display-position apply           Re-apply the saved position
 
 The result is saved in:
-  ~/.config/i3/dual-display.conf
+  ~/.config/i3/display-position/dual-display.conf
 USAGE
 }
 
@@ -58,7 +61,7 @@ save_position() {
     mkdir -p "$(dirname "$CONFIG_FILE")"
     if [ ! -f "$CONFIG_FILE" ]; then
         cat > "$CONFIG_FILE" <<'DEFAULT_CONFIG'
-# i3 dual-display defaults used by scripts/dual-display.sh.
+# i3 dual-display defaults used by display-position/dual-display.sh.
 # Supported EXTERNAL_POSITION values: right, left, above, below.
 INTERNAL_OUTPUT="eDP-1"
 EXTERNAL_OUTPUT="HDMI-1"
@@ -82,6 +85,7 @@ DEFAULT_CONFIG
         }
     ' "$CONFIG_FILE" > "$tmp_file"
     mv "$tmp_file" "$CONFIG_FILE"
+    chmod 644 "$CONFIG_FILE"
 }
 
 apply_layout() {

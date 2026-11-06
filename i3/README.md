@@ -9,7 +9,8 @@
 | `config` | i3 主配置 |
 | `backgrounds/` | 壁纸 |
 | `screenshot/` | 全屏、当前窗口、选区截图 |
-| `scripts/` | 双屏监听、触控板点击和自然滚动 |
+| `scripts/` | 触控板点击和自然滚动 |
+| `display-position/` | 外接屏位置切换、监听、配置和说明 |
 | `brightness/` | 亮度调整辅助脚本 |
 | `lock/betterlockscreen` | 锁屏脚本 |
 | `install.sh` | 安装辅助命令到 `~/.local/bin` |
@@ -97,12 +98,12 @@ i3-msg restart
 
 ## 双屏处理
 
-`scripts/dual-display.sh` 每两秒检查一次显示布局，并根据 `dual-display.conf` 自动放置外接屏。
+`display-position/dual-display.sh` 每两秒检查一次显示布局，并根据 `display-position/dual-display.conf` 自动放置外接屏。
 
 配置文件：
 
 ```text
-~/.config/i3/dual-display.conf
+~/.config/i3/display-position/dual-display.conf
 ```
 
 脚本内置默认值是 `right`。当前仓库配置为 `above`：
@@ -126,10 +127,10 @@ EXTERNAL_POSITION="above"
 
 ```bash
 sed -i 's/^EXTERNAL_POSITION=.*/EXTERNAL_POSITION="right"/' \
-  ~/.config/i3/dual-display.conf
+  ~/.config/i3/display-position/dual-display.conf
 
 pkill -f '^bash .*dual-display.sh$' || true
-i3-msg 'exec --no-startup-id $HOME/.config/i3/scripts/dual-display.sh'
+i3-msg 'exec --no-startup-id $HOME/.config/i3/display-position/dual-display.sh'
 ```
 
 监听脚本会等待旧进程释放锁，再按新配置重新应用布局。
@@ -162,6 +163,8 @@ i3-display-position apply   # 重新应用当前配置
 ```bash
 ~/.dotfile/i3/install.sh
 ```
+
+完整说明见 [`display-position/README.md`](display-position/README.md)。
 
 也可以直接手动测试：
 
@@ -208,7 +211,7 @@ xrandr --output HDMI-1 --off
 
 ```bash
 i3 -C -c ~/.config/i3/config
-bash -n ~/.config/i3/scripts/dual-display.sh
+bash -n ~/.config/i3/display-position/dual-display.sh
 xrandr --query
 ```
 

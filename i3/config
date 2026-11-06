@@ -194,7 +194,7 @@ mode "resize" {
 #}
 
 # backgrounds and dual-monitor hotplug handling
-exec_always --no-startup-id $HOME/.config/i3/scripts/dual-display.sh
+exec_always --no-startup-id $HOME/.config/i3/display-position/dual-display.sh
 #exec --no-startup-id compton -b
 # 关闭compton半透明
 #exec --no-startup-id compton --conf ~/.config/compton/compton
