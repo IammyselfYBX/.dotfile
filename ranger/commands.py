@@ -26,15 +26,19 @@ class fzf_select(Command):
             # match only directories
 #           command="find -L . \( -path '*/\.*' -o -fstype 'dev' -o -fstype 'proc' \) -prune \
 #           -o -type d -print 2> /dev/null | sed 1d | cut -b3- | fzf +m --reverse --header='Jump to file'"
-            command="find -L . \( -path '*/\.*' -o -fstype 'dev' -o -fstype 'proc' \) -prune \
-            -o -type d -print 2> /dev/null | sed 1d | cut -b3- | fzf +m  --header='Jump to file'"
+            command = (
+                r"find -L . \( -path '*/\.*' -o -fstype 'dev' -o -fstype 'proc' \) -prune "
+                r"-o -type d -print 2> /dev/null | sed 1d | cut -b3- | fzf +m  --header='Jump to file'"
+            )
         else:
             # match files and directories
 # 带 --reverse 的是fzf在上面显示，个人感觉太难看了
 #           command="find -L . \( -path '*/\.*' -o -fstype 'dev' -o -fstype 'proc' \) -prune \
 #           -o -print 2> /dev/null | sed 1d | cut -b3- | fzf +m --reverse --header='Jump to filemap <C-f> fzf_select'"
-            command="find -L . \( -path '*/\.*' -o -fstype 'dev' -o -fstype 'proc' \) -prune \
-            -o -print 2> /dev/null | sed 1d | cut -b3- | fzf +m  --header='Jump to filemap <C-f> fzf_select'"
+            command = (
+                r"find -L . \( -path '*/\.*' -o -fstype 'dev' -o -fstype 'proc' \) -prune "
+                r"-o -print 2> /dev/null | sed 1d | cut -b3- | fzf +m  --header='Jump to file'"
+            )
 
         fzf = self.fm.execute_command(command, universal_newlines=True, stdout=subprocess.PIPE)
         stdout, stderr = fzf.communicate()
