@@ -46,7 +46,9 @@ floating_modifier $mod
 # start a terminal
 #bindsym $mod+Return exec i3-sensible-terminal
 # sudo pacmman -S alacritty
-bindsym $mod+Return exec alacritty
+# CODEX_WEZTERM_DEFAULT
+bindsym $mod+Return exec wezterm
+bindsym $mod+Shift+Return exec alacritty
 
 
 # reload i3 config
