@@ -231,6 +231,9 @@ exec_always --no-startup-id /bin/sh ~/.config/i3/scripts/inverse-scroll.sh
 # Optional application launcher; enable only after installing gnome-todo.
 # exec_always --no-startup-id gnome-todo
 
+# display position menu
+bindsym $mod+Shift+d exec --no-startup-id i3-display-position
+
 # ranger
 bindsym $mod+Shift+t exec alacritty -e ranger
 

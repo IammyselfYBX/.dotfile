@@ -83,6 +83,7 @@ i3-msg restart
 | `Mod+Print` | 选区截图 |
 | `Mod+Shift+Print` | 当前窗口截图 |
 | `Mod+Shift+T` | Ranger |
+| `Mod+Shift+D` | 选择外接屏位置 |
 | `Mod+X` | Betterlockscreen |
 | `Ctrl+Shift+L` | 关闭屏幕 |
 | `Mod+C` | Chromium |
@@ -132,6 +133,35 @@ i3-msg 'exec --no-startup-id $HOME/.config/i3/scripts/dual-display.sh'
 ```
 
 监听脚本会等待旧进程释放锁，再按新配置重新应用布局。
+
+也可以使用统一命令修改并立即应用：
+
+```bash
+i3-display-position above
+i3-display-position right
+i3-display-position left
+i3-display-position below
+```
+
+不带参数会打开 dmenu 菜单；`Mod+Shift+D` 绑定了同一个菜单：
+
+```bash
+i3-display-position
+```
+
+其他命令：
+
+```bash
+i3-display-position status  # 查看配置和实际坐标
+i3-display-position cycle   # right -> above -> left -> below 轮换
+i3-display-position apply   # 重新应用当前配置
+```
+
+如果命令不存在，先重新执行安装脚本：
+
+```bash
+~/.dotfile/i3/install.sh
+```
 
 也可以直接手动测试：
 
