@@ -96,16 +96,73 @@ i3-msg restart
 
 ## 双屏处理
 
-`scripts/dual-display.sh` 每两秒检查一次显示布局：
+`scripts/dual-display.sh` 每两秒检查一次显示布局，并根据 `dual-display.conf` 自动放置外接屏。
 
-- `HDMI-1` 接入时自动放在 `eDP-1` 右侧，并重新设置双屏壁纸；
-- `HDMI-1` 断开时自动关闭残留输出，避免 i3 工作区卡在已拔出的屏幕上。
+配置文件：
 
-手动检查：
+```text
+~/.config/i3/dual-display.conf
+```
+
+默认内容：
+
+```bash
+INTERNAL_OUTPUT="eDP-1"
+EXTERNAL_OUTPUT="HDMI-1"
+EXTERNAL_POSITION="right"
+```
+
+`EXTERNAL_POSITION` 支持：
+
+| 值 | 外接屏位置 | 鼠标方向 |
+| --- | --- | --- |
+| `right` | 内屏右侧 | 从内屏右边缘移到外屏 |
+| `left` | 内屏左侧 | 从内屏左边缘移到外屏 |
+| `above` | 内屏上方 | 从内屏上边缘移到外屏 |
+| `below` | 内屏下方 | 从内屏下边缘移到外屏 |
+
+例如外接屏放在上方：
+
+```bash
+sed -i 's/^EXTERNAL_POSITION=.*/EXTERNAL_POSITION="above"/' \
+  ~/.config/i3/dual-display.conf
+
+pkill -f '^bash .*dual-display.sh$' || true
+i3-msg 'exec --no-startup-id $HOME/.config/i3/scripts/dual-display.sh'
+```
+
+也可以直接手动测试：
+
+```bash
+# 右侧
+xrandr --output HDMI-1 --auto --right-of eDP-1
+
+# 左侧
+xrandr --output HDMI-1 --auto --left-of eDP-1
+
+# 上方
+xrandr --output HDMI-1 --auto --above eDP-1
+
+# 下方
+xrandr --output HDMI-1 --auto --below eDP-1
+
+feh --bg-fill ~/.config/i3/backgrounds/little.png
+```
+
+查看当前布局：
 
 ```bash
 xrandr --query
+xrandr --listmonitors
 i3-msg -t get_workspaces
+```
+
+鼠标只能从两块屏幕的实际重叠边缘移动过去。例如外接屏在内屏正上方时，鼠标从内屏上边缘移动到外屏下边缘。两块屏幕分辨率不同时，重叠区域会以 `xrandr` 的实际坐标为边界。
+
+关闭显示器后如果工作区卡在已拔出的屏幕上，监听脚本会自动执行：
+
+```bash
+xrandr --output HDMI-1 --off
 ```
 
 ## 锁屏和关闭屏幕
