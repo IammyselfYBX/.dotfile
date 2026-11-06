@@ -1,3 +1,12 @@
-rime/luna_pinyin.userdb/
-rime/cangjie5.userdb/ 
-rime/stroke.userdb/
+# Python and editor runtime files
+__pycache__/
+*.py[cod]
+.DS_Store
+
+# Generated Rime data
+rime/build/
+rime/sync/
+rime/*.userdb/
+rime/*.userdb.old/
+rime/*.userdb.txt
+rime/*.lock

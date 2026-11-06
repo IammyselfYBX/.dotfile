@@ -13,6 +13,43 @@
   git clone git@github.com:IammyselfYBX/.dotfile.git
 #+end_src
 
+** 统一关联配置（推荐）
+先把仓库放在固定位置：
+#+begin_src bash
+  git clone git@github.com:IammyselfYBX/.dotfile.git ~/.dotfile
+  cd ~/.dotfile
+#+end_src
+
+运行链接脚本：
+#+begin_src bash
+  ./link.sh --dry-run  # 预览将要创建或备份的路径
+  ./link.sh            # 正式建立链接
+#+end_src
+
+脚本会把已经存在的配置移动到
+=~/.dotfile-backups/<时间戳>/=，再把下面的路径链接到仓库：
+
+| 仓库路径 | 家目录链接 |
+|----------+------------|
+| =xorg/Xmodmap= | =~/.Xmodmap= |
+| =xorg/xprofile= | =~/.xprofile= |
+| =i3/= | =~/.config/i3= |
+| =alacritty/= | =~/.config/alacritty= |
+| =compton/compton= | =~/.config/compton/compton= |
+| =rime/= | =~/.config/ibus/rime= |
+| =ranger/= | =~/.config/ranger= |
+| =zathura/zathurarc= | =~/.config/zathura/zathurarc= |
+| =latexmk/latexmkrc= | =~/.latexmkrc= |
+
+之后直接编辑家目录中的配置，实际修改的就是本仓库。同步时执行：
+#+begin_src bash
+  cd ~/.dotfile
+  git pull --ff-only
+  git add -A
+  git commit -m "Update dotfiles"
+  git push
+#+end_src
+
 ** 软件
 *** Xorg-server
 #+begin_src bash
@@ -96,7 +133,7 @@ ln -s ~/.dotfile/compton/compton ~/.config/compton/compton
   sudo pacman -S zathura zathura-pdf-mupdf # Arch
   sudo apt install  zathura                # ubuntu
   mkdir -p ~/.config/zathura/
-   ln -s ~/.dotfile/zathura/zathura2 ~/.config/zathura/zathurarc
+   ln -s ~/.dotfile/zathura/zathurarc ~/.config/zathura/zathurarc
 #+end_src
 
 *** latex

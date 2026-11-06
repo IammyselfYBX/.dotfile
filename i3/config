@@ -9,6 +9,7 @@
 #
 # Please see https://i3wm.org/docs/userguide.html for a complete reference!
 
+# set Window is $mod
 set $mod Mod4
 
 # Font for window titles. Will also be used by the bar unless a different font
@@ -18,10 +19,6 @@ font pango:monospace 8
 # This font is widely installed, provides lots of unicode glyphs, right-to-left
 # text rendering and scalability on retina/hidpi displays (thanks to pango).
 #font pango:DejaVu Sans Mono 8
-
-# Start XDG autostart .desktop files using dex. See also
-# https://wiki.archlinux.org/index.php/XDG_Autostart
-exec --no-startup-id dex --autostart --environment i3
 
 # The combination of xss-lock, nm-applet and pactl is a popular choice, so
 # they are included here as an example. Modify as you see fit.
@@ -35,39 +32,44 @@ exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
 exec --no-startup-id nm-applet
 
 # Use pactl to adjust volume in PulseAudio.
-set $refresh_i3status killall -SIGUSR1 i3status
-bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10% && $refresh_i3status
-bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -10% && $refresh_i3status
-bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle && $refresh_i3status
-bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOURCE@ toggle && $refresh_i3status
+# set $refresh_i3status killall -SIGUSR1 i3status
+# bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10% && $refresh_i3status
+# bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -10% && $refresh_i3status
+# bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle && $refresh_i3status
+# bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOURCE@ toggle && $refresh_i3status
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
 
-# move tiling windows via drag & drop by left-clicking into the title bar,
-# or left-clicking anywhere into the window while holding the floating modifier.
-tiling_drag modifier titlebar
-
 # start a terminal
-bindsym $mod+Return exec i3-sensible-terminal
+#bindsym $mod+Return exec i3-sensible-terminal
+# sudo pacmman -S alacritty
+bindsym $mod+Return exec alacritty
+
+
+# reload i3 config
+bindsym $mod+Shift+r exec i3 reload
 
 # kill focused window
 bindsym $mod+Shift+q kill
 
 # start dmenu (a program launcher)
-# bindsym $mod+d exec --no-startup-id dmenu_run
-bindsym $mod+d exec --no-startup-id rofi -show combi
-# A more modern dmenu replacement is rofi:
-# bindcode $mod+40 exec "rofi -modi drun,run -show drun"
-# There also is i3-dmenu-desktop which only displays applications shipping a
-# .desktop file. It is a wrapper around dmenu, so you need that installed.
-# bindcode $mod+40 exec --no-startup-id i3-dmenu-desktop
+bindsym $mod+d exec dmenu_run
+# There also is the (new) i3-dmenu-desktop which only displays applications
+# shipping a .desktop file. It is a wrapper around dmenu, so you need that
+# installed.
+# bindsym $mod+d exec --no-startup-id i3-dmenu-desktop
 
 # change focus
-bindsym $mod+j focus left
-bindsym $mod+k focus down
-bindsym $mod+l focus up
-bindsym $mod+semicolon focus right
+# like vim
+# bindsym $mod+j focus left
+# bindsym $mod+k focus down
+# bindsym $mod+l focus up
+# bindsym $mod+semicolon focus right
+bindsym $mod+j focus down
+bindsym $mod+k focus up
+bindsym $mod+l focus right
+bindsym $mod+h focus left
 
 # alternatively, you can use the cursor keys:
 bindsym $mod+Left focus left
@@ -88,7 +90,7 @@ bindsym $mod+Shift+Up move up
 bindsym $mod+Shift+Right move right
 
 # split in horizontal orientation
-bindsym $mod+h split h
+bindsym $mod+Shift+h split h
 
 # split in vertical orientation
 bindsym $mod+v split v
@@ -153,11 +155,13 @@ bindsym $mod+Shift+0 move container to workspace number $ws10
 # reload the configuration file
 bindsym $mod+Shift+c reload
 # restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
-bindsym $mod+Shift+r restart
+#bindsym $mod+Shift+r restart
+#
 # exit i3 (logs you out of your X session)
 bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -B 'Yes, exit i3' 'i3-msg exit'"
 
 # resize window (you can also use the mouse for that)
+bindsym $mod+r mode "resize"
 mode "resize" {
         # These bindings trigger as soon as you enter the resize mode
 
@@ -178,38 +182,105 @@ mode "resize" {
 
         # back to normal: Enter or Escape or $mod+r
         bindsym Return mode "default"
-        bindsym Escape mode "default"
+        bindsym Caps_Lock mode "default"
         bindsym $mod+r mode "default"
 }
 
-bindsym $mod+r mode "resize"
 
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
-bar {
-        status_command i3status
-}
+#bar {
+#        status_command i3status
+#}
 
-#####################################################
-# cumstom
-## windows config
-gaps inner 12px
-new_window 1pixel
+# backgrounds and dual-monitor hotplug handling
+exec_always --no-startup-id /home/tony/.config/i3/scripts/dual-display.sh
+#exec --no-startup-id compton -b 
+# 关闭compton半透明
+#exec --no-startup-id compton --conf ~/.config/compton/compton
+
+# key
+# exec_always xmodmap ~/.Xmodmap
+
+
+# windows maxsize minsize
+bindsym $mod+Shift+minus move scratchpad
+bindsym $mod+minus scratchpad show
+
+# window config
+# for_window [class="^.*"] border pixel 4
+gaps inner 12px    
+# 窗口边框
+new_window 1pixel 
+# 不想看i3窗口的上面的蓝色的栏
+# new_float 1pixel
+## Only enable gaps on a workspace when there is at least one container
 smart_borders on
 
-## Input Config
+# Input config
 exec --no-startup-id export GTK_IM_MODULE=ibus
 exec --no-startup-id export XMODIFIERS=@im=ibus
 exec --no-startup-id export QT_IM_MODULE=ibus
-exec --no-startup-id ibus-daemon -x -d 
+exec --no-startup-id ibus-daemon --xim -d -r
 
-## modmap 
-exec --no-startup-id /usr/bin/xmodmap ~/.Xmodmap
-# 关闭屏幕
-bindsym ctrl+Shift+l exec "/home/tony/.local/bin/screen_off"
 
-## 截屏
+# begin run
+exec_always --no-startup-id /bin/sh ~/.config/i3/scripts/tap-to-click.sh
+exec_always --no-startup-id /bin/sh ~/.config/i3/scripts/inverse-scroll.sh
+# exec_always --no-startup-id /bin/gthumb /home/tony/Pictures/课表.png
+ exec_always --no-startup-id /bin/gnome-todo
+
+# ranger
+bindsym $mod+Shift+t exec alacritty -e ranger
+
+# screenshot
+## cut all the screen 
 bindsym --release Print exec "/bin/sh ~/.config/i3/screenshot/cut_all.sh"
+## cut current window
 bindsym --release $mod+Shift+Print exec "/bin/sh ~/.config/i3/screenshot/cut_cur.sh"
+## cut selection 
 bindsym --release $mod+Print exec "/bin/sh ~/.config/i3/screenshot/cut_sel.sh"
+
+# Screen bright
+# sudo chmod 666 /sys/class/backlight/intel_backlight/brightness
+bindsym XF86MonBrightnessUp exec "xbacklight -inc 10" 
+bindsym XF86MonBrightnessDown exec "xbacklight -dec 10" 
+
+
+# for sound control
+bindsym XF86AudioRaiseVolume exec amixer set Master playback 2000+
+bindsym XF86AudioLowerVolume exec amixer set Master playback 2000-
+bindsym XF86AudioMute exec amixer set Master toggle
+
+# 黑屏、睡眠、断电时间分别设为6000s，8000s，9000s，也可以只写前一个，不必三个都写
+# exec --no-startup-id xset dpms 6000 8000 9000
+# exec --no-startup-id xset dpms 24000
+# 锁屏
+# https://github.com/pavanjadhaw/betterlockscreen
+#    Note: Make sure your system has all dependencies satisfied
+#
+#    i3lock-color - i3lock fork with additional features( >= 2.11-c )
+#    imagemagick - To apply effects to images
+#    xdpyinfo, xrandr, bc and feh - To find screen resolution, set custom blur level and wallpaper handling.
+bindsym $mod+x exec "betterlockscreen -u ~/.config/i3/lock/ante.jpg -l -b 1 dim"
+
+# 立即关闭屏幕
+bindsym ctrl+Shift+l exec "/home/tony/.local/bin/screen_off" 
+
+# 常用应用的快捷键
+bindsym $mod+c exec chromium
+
+
+# 使用polybar
+exec_always --no-startup-id $HOME/.config/polybar/launch.sh
+
+
+
+
+
+
+
+
+
+
 
