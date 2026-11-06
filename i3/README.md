@@ -204,6 +204,8 @@ xrandr --output HDMI-1 --off
 
 默认不自动锁屏，也不会因为空闲而熄屏。只有手动操作才会锁屏或关闭屏幕。
 
+手动锁屏后，屏幕保持点亮 1 分钟；如果仍未解锁，则自动熄屏。解锁后重新恢复“不自动熄屏”状态。
+
 锁屏脚本的源文件位于 `~/.config/i3/lock/lock-screen.sh`，`install.sh` 会将它链接到 `~/.local/bin/lock-screen`。
 
 ```bash

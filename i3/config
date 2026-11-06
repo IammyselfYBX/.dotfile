@@ -22,7 +22,7 @@ font pango:monospace 8
 
 # 不进行空闲熄屏或自动锁屏。
 # 只有 Mod+L 才会手动进入壁纸锁屏；Ctrl+Shift+L 可手动关闭屏幕。
-exec --no-startup-id xset s off -dpms
+exec --no-startup-id sh -c 'xset s off; xset -dpms'
 
 # NetworkManager is the most popular way to manage wireless networks on Linux,
 # and nm-applet is a desktop environment-independent system tray GUI for it.
