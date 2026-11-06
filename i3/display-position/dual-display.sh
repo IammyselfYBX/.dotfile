@@ -5,7 +5,7 @@ set -u
 CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 I3_DIR="$CONFIG_HOME/i3"
 DISPLAY_POSITION_DIR="$I3_DIR/display-position"
-WALLPAPER="$I3_DIR/backgrounds/little.png"
+WALLPAPER="$I3_DIR/backgrounds/desktop-wallpaper.png"
 CONFIG_FILE="$DISPLAY_POSITION_DIR/dual-display.conf"
 RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp}"
 LOCK_FILE="$RUNTIME_DIR/i3-dual-display-${UID}.lock"

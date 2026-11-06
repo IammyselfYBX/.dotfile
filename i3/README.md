@@ -181,7 +181,7 @@ xrandr --output HDMI-1 --auto --above eDP-1
 # 下方
 xrandr --output HDMI-1 --auto --below eDP-1
 
-feh --bg-fill ~/.config/i3/backgrounds/little.png
+feh --bg-fill ~/.config/i3/backgrounds/desktop-wallpaper.png
 ```
 
 查看当前布局：
@@ -202,8 +202,10 @@ xrandr --output HDMI-1 --off
 
 ## 锁屏和关闭屏幕
 
+锁屏脚本的源文件位于 `~/.config/i3/lock/lock-screen.sh`，`install.sh` 会将它链接到 `~/.local/bin/lock-screen`。
+
 ```bash
-~/.local/bin/betterlockscreen -u ~/.config/i3/lock/ante.jpg -l -b 1 dim
+~/.local/bin/lock-screen
 ~/.local/bin/screen_off
 ```
 

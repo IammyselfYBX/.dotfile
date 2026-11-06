@@ -7,7 +7,7 @@ I3_DIR="$CONFIG_HOME/i3"
 DISPLAY_POSITION_DIR="$I3_DIR/display-position"
 CONFIG_FILE="$DISPLAY_POSITION_DIR/dual-display.conf"
 WATCHER="$DISPLAY_POSITION_DIR/dual-display.sh"
-WALLPAPER="$I3_DIR/backgrounds/little.png"
+WALLPAPER="$I3_DIR/backgrounds/desktop-wallpaper.png"
 VALID_POSITIONS="right above left below"
 
 usage() {
