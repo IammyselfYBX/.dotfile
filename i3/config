@@ -199,7 +199,7 @@ exec_always --no-startup-id $HOME/.config/i3/display-position/dual-display.sh
 #exec --no-startup-id compton --conf ~/.config/compton/compton
 
 # key
-# exec_always xmodmap ~/.Xmodmap
+exec_always --no-startup-id xmodmap ~/.Xmodmap
 
 
 # windows maxsize minsize
@@ -224,8 +224,7 @@ exec --no-startup-id ibus-daemon --xim -d -r
 
 
 # begin run
-exec_always --no-startup-id /bin/sh ~/.config/i3/scripts/tap-to-click.sh
-exec_always --no-startup-id /bin/sh ~/.config/i3/scripts/inverse-scroll.sh
+exec_always --no-startup-id /bin/sh ~/.config/i3/scripts/touchpad-settings.sh
 # exec_always --no-startup-id /bin/gthumb /home/tony/Pictures/课表.png
 # Optional application launcher; enable only after installing gnome-todo.
 # exec_always --no-startup-id gnome-todo
