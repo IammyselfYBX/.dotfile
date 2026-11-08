@@ -53,3 +53,37 @@ without replacing unrelated fonts.
 ** Host-specific settings
 Host overrides live in =hosts/$(hostname -s)/=. System files such as =/etc/hosts=
 are handled separately with sudo and are not symlinked from the home directory.
+
+** 统一终端管理器
+新增 =scripts/dotctl.py=，并提供可执行入口 =scripts/dotctl=。程序只使用
+Python 标准库和 curses，不依赖第三方 Python 包。
+
+直接运行交互界面：
+#+begin_src bash
+  ~/.dotfile/scripts/dotctl
+#+end_src
+
+常用非交互命令：
+#+begin_src bash
+  ~/.dotfile/scripts/dotctl --check
+  ~/.dotfile/scripts/dotctl --check --json
+  ~/.dotfile/scripts/dotctl --dry-run
+  ~/.dotfile/scripts/dotctl --install-all
+#+end_src
+
+界面中的状态：
+- 绿色 = 已安装
+- 黄色 = 待安装
+- 红色 = 目标已存在但不是当前受管理配置，安装时会先备份
+
+按键：
+- 上/下：移动
+- Enter：查看配置详情
+- i：安装或修复选中项
+- a：调用完整 bootstrap 流程安装全部配置
+- r：刷新状态
+- ESC：返回上一级；首层按 ESC 退出
+- q：退出
+
+=--install-all= 会调用现有的 =bootstrap.sh=，继续复用 =link.sh=、Shell/Git
+集成和字体安装流程。Vim 仍由 =~/.vim= 独立管理，不出现在本管理器中。

@@ -1,0 +1,13 @@
+* Dotfile manager
+- =dotctl.py=: curses TUI and non-interactive CLI
+- =dotctl=: executable symlink to =dotctl.py=
+- =install-fonts.sh=: link shared font families
+- =install-shell-entry.sh=: integrate Bash/Zsh startup files
+- =install-git-include.sh=: integrate =~/.gitconfig=
+
+Run:
+#+begin_src bash
+  ./dotctl
+  ./dotctl --check
+  ./dotctl --install-all
+#+end_src
