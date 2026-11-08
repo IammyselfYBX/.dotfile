@@ -897,20 +897,24 @@ class DotfilesTUI:
             self.message_ok = False
             return
 
-        raw_pager = os.environ.get("PAGER") or "less -R"
+        raw_editor = (
+            os.environ.get("EDITOR")
+            or os.environ.get("VISUAL")
+            or os.environ.get("EDITER")
+            or "vim"
+        )
         try:
-            command = shlex.split(raw_pager)
+            command = shlex.split(raw_editor)
         except ValueError as exc:
-            self.message = f"分页器命令无效: {exc}"
+            self.message = f"编辑器命令无效: {exc}"
             self.message_ok = False
             return
         if not command:
-            command = ["less", "-R"]
+            self.message = "编辑器命令为空"
+            self.message_ok = False
+            return
         if shutil.which(command[0]) is None:
-            fallback_editor = os.environ.get("EDITOR") or os.environ.get("VISUAL") or "vim"
-            command = shlex.split(fallback_editor)
-        if not command or shutil.which(command[0]) is None:
-            self.message = f"找不到分页器或编辑器，文档位于: {path}"
+            self.message = f"找不到编辑器: {command[0]}"
             self.message_ok = False
             return
 
@@ -919,12 +923,9 @@ class DotfilesTUI:
         error: str | None = None
         returncode = 1
         try:
-            env = os.environ.copy()
-            env.setdefault("LESS", "-R")
             result = subprocess.run(
                 command + [os.fspath(path)],
                 cwd=os.fspath(REPO),
-                env=env,
             )
             returncode = result.returncode
         except Exception as exc:
@@ -937,13 +938,13 @@ class DotfilesTUI:
                 pass
 
         if error:
-            self.message = f"文档查看失败: {error}"
+            self.message = f"文档打开失败: {error}"
             self.message_ok = False
         elif returncode == 0:
-            self.message = f"已查看文档: {path}"
+            self.message = f"已使用编辑器打开文档: {path}"
             self.message_ok = True
         else:
-            self.message = f"分页器退出码: {returncode}"
+            self.message = f"编辑器退出码: {returncode}"
             self.message_ok = False
 
     def edit_source(self, item: Item) -> None:

@@ -24,5 +24,5 @@ same commit.
 
 
 Each managed configuration directory also contains a =doc/wiki.md=. =dotctl=
-opens the relevant wiki when =h= is pressed. The i3 wiki contains the complete
+opens the relevant wiki with the default editor when =h= is pressed. The i3 wiki contains the complete
 current shortcut reference and related helper-command documentation.
