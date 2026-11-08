@@ -1,6 +1,6 @@
 # GNOME / 桌面启动器配置
 
-本目录保存桌面启动器示例，不会由 `link.sh` 自动安装。
+本目录保存桌面启动器，由 `dotctl` 统一链接到应用菜单。
 
 ## Qt Creator 启动器
 
@@ -9,18 +9,10 @@
 安装到应用菜单：
 
 ```bash
-mkdir -p ~/.local/share/applications
-ln -sf ~/.dotfile/desktop/gnome/桌面图标/Qt_create.desktop \
-  ~/.local/share/applications/Qt_create.desktop
-update-desktop-database ~/.local/share/applications
+~/.dotfile/scripts/dotctl
 ```
 
-安装到桌面：
-
-```bash
-mkdir -p ~/Desktop
-ln -sf ~/.dotfile/desktop/gnome/桌面图标/Qt_create.desktop ~/Desktop/Qt_create.desktop
-```
+在 `dotctl` 中选中 `Qt Creator 应用菜单启动器` 并按 `i` 安装。
 
 ## 修改路径
 

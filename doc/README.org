@@ -1,0 +1,23 @@
+* Dotfile metadata catalog
+=catalog.json= stores static information used by =dotctl=.
+
+Each item can define:
+- =description=: what the configuration does
+- =contents=: repository files or directories that make up the item
+- =related=: other managed item ids
+- =dependencies=: commands and fonts needed for the configuration to work
+- =notes=: machine or package caveats
+
+Dependency entries support:
+#+begin_src json
+  {"kind": "command", "name": "feh", "required": true,
+   "arch": "feh", "debian": "feh"}
+  {"kind": "font", "name": "JetBrainsMono Nerd Font Mono", "required": true}
+#+end_src
+
+=dotctl= reads this file at startup. Command lookup and Fontconfig checks are
+performed only when an item's detail page is opened, so the overview remains
+fast and does not require network access.
+
+When adding a managed item or a new runtime dependency, update this file in the
+same commit.

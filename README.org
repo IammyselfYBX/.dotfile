@@ -16,6 +16,7 @@ Vim is managed separately in =~/.vim= and is not linked or modified here.
 - =assets/=: shared fonts, icons, wallpapers, images and themes
 - =hosts/<hostname>/=: machine-specific overrides
 - =packages/=: package and extension inventories
+- =doc/=: static metadata and dependency catalog
 - =scripts/=: integration helpers
 
 ** First install
@@ -83,13 +84,16 @@ Python 标准库和 curses，不依赖第三方 Python 包。
 - i：安装或合并选中项
 - d：查看源文件与当前目标的差异
 - o：备份并覆盖为受管理配置
-- a：调用完整 bootstrap 流程安装全部配置
+- a：先显示完整安装计划和冲突列表，确认后调用 bootstrap 流程
 - r：刷新状态
 - ESC：返回上一级；首层按 ESC 退出
 - q：退出
 
 编辑功能优先使用 =$EDITOR=，其次 =$VISUAL=，未设置时回退到 =vim=。
 编辑器退出后会自动恢复管理器界面并刷新配置状态。
+
+配置说明、组成文件、关联项和依赖存放在 =doc/catalog.json=。
+首屏只读取这个静态文件；命令和字体依赖仅在打开详情时检查，因此启动不需要联网或逐项探测。
 
 i3 的 =screen_off=、=betterlockscreen=、=lock-screen= 和
 =i3-display-position= 也已纳入 =dotctl=，不再维护单独的 =install.sh=。

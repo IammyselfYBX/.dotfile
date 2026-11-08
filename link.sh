@@ -81,6 +81,7 @@ links=(
     "$REPO_DIR/desktop/compton|$HOME_DIR/.config/compton"
     "$REPO_DIR/desktop/polybar|$HOME_DIR/.config/polybar"
     "$REPO_DIR/desktop/autostart|$HOME_DIR/.config/autostart"
+    "$REPO_DIR/desktop/gnome/桌面图标/Qt_create.desktop|$HOME_DIR/.local/share/applications/Qt_create.desktop"
     "$REPO_DIR/input-method/rime|$HOME_DIR/.config/ibus/rime"
     "$REPO_DIR/file-manager/ranger|$HOME_DIR/.config/ranger"
     "$REPO_DIR/desktop/i3/brightness/screen_off.sh|$HOME_DIR/.local/bin/screen_off"

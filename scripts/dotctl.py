@@ -23,6 +23,17 @@ from pathlib import Path
 HOME = Path.home()
 REPO = Path(__file__).resolve().parent.parent
 BACKUP_ROOT = HOME / ".dotfile-backups"
+CATALOG_PATH = REPO / "doc" / "catalog.json"
+
+
+def load_catalog() -> dict:
+    try:
+        return json.loads(CATALOG_PATH.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+
+CATALOG = load_catalog()
 
 SHELL_BEGIN = "# >>> dotfiles managed block >>>"
 SHELL_END = "# <<< dotfiles managed block <<<"
@@ -94,6 +105,7 @@ LINK_SPECS = [
     ("desktop-compton", "Desktop", "Compton", "desktop/compton", ".config/compton"),
     ("desktop-polybar", "Desktop", "Polybar", "desktop/polybar", ".config/polybar"),
     ("desktop-autostart", "Desktop", "桌面自启动项", "desktop/autostart", ".config/autostart"),
+    ("desktop-qtcreator-launcher", "Desktop", "Qt Creator 应用菜单启动器", "desktop/gnome/桌面图标/Qt_create.desktop", ".local/share/applications/Qt_create.desktop"),
     ("input-rime", "Input", "Rime 输入法", "input-method/rime", ".config/ibus/rime"),
     ("file-ranger", "Files", "Ranger 文件管理器", "file-manager/ranger", ".config/ranger"),
     ("i3-screen-off", "i3 Tools", "screen_off 命令", "desktop/i3/brightness/screen_off.sh", ".local/bin/screen_off"),
@@ -269,6 +281,76 @@ def build_diff(item: Item) -> list[str]:
         return [f"类型不同: 源是文件，目标是目录 {target_cmp}"]
     lines = _file_diff(source, target_cmp)
     return lines or ["没有发现文件差异。"]
+
+
+_COMMAND_CACHE: dict[str, bool] = {}
+_FONT_CACHE: dict[str, bool | None] = {}
+
+
+def item_meta(item: Item) -> dict:
+    meta = CATALOG.get("items", {}).get(item.item_id)
+    if isinstance(meta, dict):
+        return meta
+    if item.category == "Fonts":
+        return {
+            "description": "由 fontconfig 管理的共享字体家族。",
+            "contents": [item.source_rel],
+            "dependencies": [{"kind": "command", "name": "fc-cache", "required": False}],
+        }
+    return {
+        "description": "由 ~/.dotfile 管理的配置文件。",
+        "contents": [item.source_rel],
+        "dependencies": [],
+    }
+
+
+def command_available(name: str) -> bool:
+    if name not in _COMMAND_CACHE:
+        _COMMAND_CACHE[name] = shutil.which(name) is not None
+    return _COMMAND_CACHE[name]
+
+
+def font_available(family: str) -> bool | None:
+    if family in _FONT_CACHE:
+        return _FONT_CACHE[family]
+    fc_match = shutil.which("fc-match")
+    if not fc_match:
+        _FONT_CACHE[family] = None
+        return None
+    try:
+        result = subprocess.run(
+            [fc_match, "-f", "%{family}\n", family],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=3,
+        )
+        actual = result.stdout.lower().replace(" ", "")
+        wanted = family.lower().replace(" ", "")
+        _FONT_CACHE[family] = wanted in actual
+    except (OSError, subprocess.SubprocessError):
+        _FONT_CACHE[family] = None
+    return _FONT_CACHE[family]
+
+
+def dependency_results(item: Item) -> list[dict]:
+    results = []
+    for dep in item_meta(item).get("dependencies", []):
+        if not isinstance(dep, dict):
+            continue
+        kind = str(dep.get("kind", "command"))
+        name = str(dep.get("name", "")).strip()
+        if not name:
+            continue
+        required = bool(dep.get("required", True))
+        if kind == "font":
+            available = font_available(name)
+        else:
+            available = command_available(name)
+        results.append({**dep, "kind": kind, "name": name, "required": required, "available": available})
+    return results
 
 
 def get_status(item: Item) -> Status:
@@ -632,66 +714,154 @@ class DotfilesTUI:
             if ch in (ord("n"), ord("N"), 27):
                 return False
 
-    def detail_body(self, item: Item, status: Status) -> str:
-        if status.code == STATUS_INSTALLED:
-            action = "已安装。按 e 编辑仓库源文件，按 d 查看源与当前目标之间的差异。"
-        elif status.code == STATUS_SOURCE:
-            action = "源文件缺失，请先修复仓库内容。"
-        elif item.kind == "link":
-            action = (
-                "按 e 编辑仓库源文件；按 i 接管为软链接；按 o 强制覆盖为软链接；\n"
-                "按 d 查看源与现有目标的差异。发生冲突时，旧目标会先备份。"
-            )
-        else:
-            action = (
-                "按 e 编辑仓库源文件；按 i 合并：保留原内容并追加受管理块；\n"
-                "按 o 覆盖：备份原文件后替换为受管理 shim；按 d 查看差异。"
-            )
+    def item_by_id(self, item_id: str) -> Item | None:
+        for item in self.items:
+            if item.item_id == item_id:
+                return item
+        return None
 
-        actual = ""
+    def detail_lines(self, item: Item, status: Status) -> list[tuple[str, int, bool]]:
+        meta = item_meta(item)
+        lines: list[tuple[str, int, bool]] = []
+        lines.append((f"状态: {status.label}", status.pair, True))
+        lines.append((f"类别: {item.category}", PAIR_GRAY, False))
+        lines.append((f"名称: {item.name}", PAIR_GRAY, False))
+        lines.append((f"方式: {item.kind_label}", PAIR_GRAY, False))
+        lines.append((f"源: {item.source}", PAIR_GRAY, False))
+        source_type = "目录" if item.source.is_dir() else "文件"
+        lines.append((f"源类型: {source_type}", PAIR_GRAY, False))
+        lines.append((f"目标: {item.target}", PAIR_GRAY, False))
         if item.target.is_symlink():
             try:
-                actual = f"\n当前软链接 -> {os.readlink(item.target)}"
+                lines.append((f"当前软链接 -> {os.readlink(item.target)}", PAIR_GRAY, False))
             except OSError:
-                actual = "\n当前软链接无法读取"
+                lines.append(("当前软链接无法读取", PAIR_RED, False))
 
-        source_type = "目录" if item.source.is_dir() else "文件"
-        return (
-            f"状态: {status.label}\n"
-            f"类别: {item.category}\n"
-            f"名称: {item.name}\n"
-            f"方式: {item.kind_label}\n\n"
-            f"源: {item.source}\n"
-            f"源类型: {source_type}\n"
-            f"目标: {item.target}{actual}\n\n"
-            f"{action}"
-        )
+        description = str(meta.get("description", "")).strip()
+        if description:
+            lines.append(("", PAIR_GRAY, False))
+            lines.append(("说明:", PAIR_CYAN, True))
+            lines.append((description, PAIR_GRAY, False))
+
+        contents = meta.get("contents", [])
+        if contents:
+            lines.append(("", PAIR_GRAY, False))
+            lines.append(("配置组成:", PAIR_CYAN, True))
+            for rel in contents:
+                path = REPO / str(rel)
+                exists = path.exists() or path.is_symlink()
+                pair = PAIR_GREEN if exists else PAIR_RED
+                marker = "✓" if exists else "✗"
+                lines.append((f"[{marker}] {rel}", pair, False))
+
+        related = meta.get("related", [])
+        if related:
+            lines.append(("", PAIR_GRAY, False))
+            lines.append(("关联管理项:", PAIR_CYAN, True))
+            for related_id in related:
+                related_item = self.item_by_id(str(related_id))
+                if not related_item:
+                    lines.append((f"[?] 未登记: {related_id}", PAIR_YELLOW, False))
+                    continue
+                related_status = get_status(related_item)
+                lines.append(
+                    (
+                        f"[{related_status.label}] {related_item.name} -> {related_item.target}",
+                        related_status.pair,
+                        False,
+                    )
+                )
+
+        dependencies = dependency_results(item)
+        lines.append(("", PAIR_GRAY, False))
+        lines.append(("依赖:", PAIR_CYAN, True))
+        if not dependencies:
+            lines.append(("[✓] 无额外依赖", PAIR_GREEN, False))
+        for dep in dependencies:
+            available = dep.get("available")
+            required = dep.get("required", True)
+            if available is True:
+                marker, pair = "✓", PAIR_GREEN
+            elif available is False and required:
+                marker, pair = "✗", PAIR_RED
+            elif available is False:
+                marker, pair = "○", PAIR_YELLOW
+            else:
+                marker, pair = "?", PAIR_YELLOW
+            label = "字体" if dep.get("kind") == "font" else "命令"
+            suffix = "" if required else "（可选）"
+            packages = []
+            if dep.get("arch"):
+                packages.append(f"Arch: {dep['arch']}")
+            if dep.get("debian"):
+                packages.append(f"Debian: {dep['debian']}")
+            package_text = f"  [{', '.join(packages)}]" if packages else ""
+            lines.append((f"[{marker}] {label}{suffix}: {dep['name']}{package_text}", pair, False))
+        lines.append(("依赖检查只读取本机命令和字体，不联网，也不会自动安装系统包。", PAIR_GRAY, False))
+
+        notes = str(meta.get("notes", "")).strip()
+        if notes:
+            lines.append(("", PAIR_GRAY, False))
+            lines.append(("备注:", PAIR_CYAN, True))
+            lines.append((notes, PAIR_YELLOW, False))
+
+        lines.append(("", PAIR_GRAY, False))
+        lines.append(("操作:", PAIR_CYAN, True))
+        if status.code == STATUS_INSTALLED:
+            lines.append(("e 编辑源文件；d 查看差异。", PAIR_GRAY, False))
+        elif status.code == STATUS_SOURCE:
+            lines.append(("源文件缺失，请先修复仓库内容。", PAIR_RED, False))
+        elif item.kind == "link":
+            lines.append(("e 编辑源文件；i 接管为软链接；o 强制覆盖；d 查看差异。", PAIR_GRAY, False))
+        else:
+            lines.append(("e 编辑源文件；i 合并（保留原内容）；o 覆盖为 shim；d 查看差异。", PAIR_GRAY, False))
+        return lines
 
     def show_detail(self, item: Item) -> None:
+        offset = 0
         while True:
             status = get_status(item)
+            lines = self.detail_lines(item, status)
             self.stdscr.erase()
             height, width = self.stdscr.getmaxyx()
             title = f"{item.category} / {item.name}"
             self.addstr(0, 2, clip_text(title, max(0, width - 4)), self.pair(PAIR_CYAN) | curses.A_BOLD)
             self.addstr(1, 2, clip_text(f"状态: {status.label}", max(0, width - 4)), self.pair(status.pair) | curses.A_BOLD)
             self.addstr(2, 0, "─" * max(1, width - 1), self.pair(PAIR_GRAY))
-            y = 4
-            for line in wrap_text(self.detail_body(item, status), max(10, width - 6)):
-                if y >= height - 3:
-                    break
-                self.addstr(y, 2, line, self.pair(PAIR_GRAY))
-                y += 1
+
+            rendered: list[tuple[str, int, bool]] = []
+            inner_width = max(10, width - 6)
+            for text, pair, bold in lines:
+                if not text:
+                    rendered.append(("", pair, False))
+                    continue
+                for wrapped in wrap_text(text, inner_width):
+                    rendered.append((wrapped, pair, bold))
+
+            visible = max(1, height - 5)
+            offset = max(0, min(offset, max(0, len(rendered) - visible)))
+            for row, (text, pair, bold) in enumerate(rendered[offset : offset + visible], 3):
+                attr = self.pair(pair) | (curses.A_BOLD if bold else 0)
+                self.addstr(row, 2, text, attr)
+
             if self.message and height >= 3:
                 attr = self.pair(PAIR_GREEN if self.message_ok else PAIR_RED) | curses.A_BOLD
                 self.addstr(height - 2, 1, clip_text(self.message, max(0, width - 2)), attr)
-            footer = "e 编辑   i 安装/合并   o 覆盖   d 差异   a 全部安装   ESC 返回"
+            footer = "↑/↓ 滚动  e 编辑  i 安装/合并  o 覆盖  d 差异  a 全部安装  ESC 返回"
             self.addstr(height - 1, 1, clip_text(footer, max(0, width - 2)), self.pair(PAIR_GRAY))
             self.stdscr.refresh()
             ch = self.stdscr.getch()
             if ch in (27, ord("q"), curses.KEY_LEFT):
                 return
-            if ch in (ord("e"), ord("E")):
+            if ch in (curses.KEY_UP, ord("k")):
+                offset = max(0, offset - 1)
+            elif ch in (curses.KEY_DOWN, ord("j")):
+                offset = min(max(0, len(rendered) - visible), offset + 1)
+            elif ch == curses.KEY_PPAGE:
+                offset = max(0, offset - visible)
+            elif ch == curses.KEY_NPAGE:
+                offset = min(max(0, len(rendered) - visible), offset + visible)
+            elif ch in (ord("e"), ord("E")):
                 self.edit_source(item)
             elif ch in (ord("i"), ord("I")):
                 self.install_selected(item)
@@ -701,42 +871,6 @@ class DotfilesTUI:
                 self.show_diff(item)
             elif ch in (ord("a"), ord("A")):
                 self.install_all()
-
-    def install_selected(self, item: Item, overwrite: bool = False) -> None:
-        status = get_status(item)
-        if status.code == STATUS_INSTALLED and not overwrite:
-            self.message = f"{item.name}: 已安装"
-            self.message_ok = True
-            return
-        if status.code == STATUS_SOURCE:
-            self.message = f"{item.name}: 源文件缺失，无法安装"
-            self.message_ok = False
-            return
-        if overwrite:
-            if item.kind == "link":
-                prompt = "将备份现有目标并覆盖为受管理软链接。继续吗？"
-            else:
-                prompt = "将备份现有文件并覆盖为受管理 shim。原内容不会自动合并。继续吗？"
-            title = f"覆盖 {item.name}"
-        elif item.kind == "link" and status.code == STATUS_CONFLICT:
-            prompt = "目标已存在，将备份后接管为受管理软链接。继续吗？"
-            title = f"接管 {item.name}"
-        elif item.kind != "link" and status.code == STATUS_CONFLICT:
-            prompt = "目标已存在，将保留原内容并追加受管理块。继续吗？"
-            title = f"合并 {item.name}"
-        else:
-            prompt = "确认安装这个配置吗？"
-            title = f"安装 {item.name}"
-        if not self.confirm(title, prompt):
-            return
-        try:
-            changed, msg = install_one(item, overwrite=overwrite)
-            self.message = msg.replace("\n", " ")
-            self.message_ok = changed
-        except Exception as exc:
-            self.message = f"安装失败: {exc}"
-            self.message_ok = False
-        self.refresh()
 
     def edit_source(self, item: Item) -> None:
         path = item.source
@@ -835,8 +969,87 @@ class DotfilesTUI:
             elif ch == curses.KEY_NPAGE:
                 offset = min(max(0, len(lines) - visible), offset + visible)
 
+    def plan_lines(self) -> tuple[list[tuple[str, int, bool]], int, int, int, int]:
+        installed = pending = conflict = missing = 0
+        lines: list[tuple[str, int, bool]] = []
+        for item in self.items:
+            status = get_status(item)
+            if status.code == STATUS_INSTALLED:
+                installed += 1
+                continue
+            if status.code == STATUS_PENDING:
+                pending += 1
+            elif status.code == STATUS_CONFLICT:
+                conflict += 1
+            elif status.code == STATUS_SOURCE:
+                missing += 1
+
+            if item.kind == "link":
+                action = "备份并接管为软链接" if status.code == STATUS_CONFLICT else "创建软链接"
+            else:
+                action = "备份并追加受管理块" if status.code == STATUS_CONFLICT else "创建受管理 shim"
+            if status.code == STATUS_SOURCE:
+                action = "源文件缺失，无法安装"
+            lines.append(
+                (
+                    f"[{status.label}] {item.category} / {item.name} -> {item.target}  |  {action}",
+                    status.pair,
+                    False,
+                )
+            )
+        return lines, installed, pending, conflict, missing
+
+    def show_install_plan(self) -> bool:
+        lines, installed, pending, conflict, missing = self.plan_lines()
+        offset = 0
+        while True:
+            self.stdscr.erase()
+            height, width = self.stdscr.getmaxyx()
+            title = "全部安装计划"
+            self.addstr(0, 2, title, self.pair(PAIR_CYAN) | curses.A_BOLD)
+            summary = f"已安装 {installed}  待安装 {pending}  冲突 {conflict}  源缺失 {missing}"
+            self.addstr(1, 2, clip_text(summary, max(0, width - 4)), curses.A_BOLD)
+            self.addstr(2, 0, "─" * max(1, width - 1), self.pair(PAIR_GRAY))
+            if not lines:
+                body = [("所有配置均已安装，无需执行安装。", PAIR_GREEN, True)]
+            else:
+                body = lines
+            rendered: list[tuple[str, int, bool]] = []
+            inner_width = max(10, width - 6)
+            for text, pair, bold in body:
+                for wrapped in wrap_text(text, inner_width):
+                    rendered.append((wrapped, pair, bold))
+            visible = max(1, height - 5)
+            offset = max(0, min(offset, max(0, len(rendered) - visible)))
+            for row, (text, pair, bold) in enumerate(rendered[offset : offset + visible], 3):
+                attr = self.pair(pair) | (curses.A_BOLD if bold else 0)
+                self.addstr(row, 2, clip_text(text, max(0, width - 4)), attr)
+            if lines and missing == 0:
+                footer = "↑/↓ 滚动   y 确认安装   n/ESC 取消"
+            elif lines:
+                footer = "存在源缺失，无法全部安装；n/ESC 返回"
+            else:
+                footer = "按任意键返回"
+            self.addstr(height - 1, 1, clip_text(footer, max(0, width - 2)), self.pair(PAIR_GRAY))
+            self.stdscr.refresh()
+            ch = self.stdscr.getch()
+            if not lines:
+                return False
+            if ch in (ord("y"), ord("Y")):
+                return missing == 0
+            if ch in (27, ord("n"), ord("N"), ord("q"), ord("Q")):
+                return False
+            if ch in (curses.KEY_UP, ord("k")):
+                offset = max(0, offset - 1)
+            elif ch in (curses.KEY_DOWN, ord("j")):
+                offset = min(max(0, len(rendered) - visible), offset + 1)
+            elif ch == curses.KEY_PPAGE:
+                offset = max(0, offset - visible)
+            elif ch == curses.KEY_NPAGE:
+                offset = min(max(0, len(rendered) - visible), offset + visible)
+
     def install_all(self) -> None:
-        if not self.confirm("全部安装", "将执行 bootstrap.sh，可能会备份并替换冲突项。继续吗？"):
+        if not self.show_install_plan():
             return
         self.stdscr.erase()
         self.addstr(0, 2, "正在执行 bootstrap.sh …", self.pair(PAIR_CYAN) | curses.A_BOLD)

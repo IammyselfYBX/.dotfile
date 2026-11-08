@@ -21,3 +21,12 @@ overwritten with =o= after an automatic backup.
 Press =e= in the list or detail page to edit the repository source file with
 =$EDITOR= (fallback: =$VISUAL=, then =vim=). The curses screen is suspended and
 restored when the editor exits.
+
+
+Item descriptions, file groups, related entries and dependency checks are read
+from =doc/catalog.json=. Startup reads that static file only; command and font
+checks run when a detail page is opened.
+
+
+Press =a= to show a scrollable preflight plan before running bootstrap. The plan
+lists every pending item, every conflict and the action that will be performed.

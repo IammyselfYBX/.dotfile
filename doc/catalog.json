@@ -1,0 +1,960 @@
+{
+  "version": 1,
+  "description": "Static metadata for dotctl. Edit this file when adding a managed item or dependency.",
+  "items": {
+    "xorg-xmodmap": {
+      "description": "X11 键盘映射，当前主要用于交换 Caps Lock 与 Escape。",
+      "contents": [
+        "desktop/xorg/Xmodmap"
+      ],
+      "dependencies": [
+        {
+          "kind": "command",
+          "name": "xmodmap",
+          "required": true,
+          "arch": "xorg-xmodmap",
+          "debian": "x11-xserver-utils"
+        }
+      ]
+    },
+    "xorg-xprofile": {
+      "description": "X 会话启动时的输入法环境变量，并启动 IBus。",
+      "contents": [
+        "desktop/xorg/xprofile"
+      ],
+      "dependencies": [
+        {
+          "kind": "command",
+          "name": "ibus-daemon",
+          "required": true,
+          "arch": "ibus",
+          "debian": "ibus"
+        },
+        {
+          "kind": "command",
+          "name": "xmodmap",
+          "required": true,
+          "arch": "xorg-xmodmap",
+          "debian": "x11-xserver-utils"
+        }
+      ]
+    },
+    "xorg-xresources": {
+      "description": "X11 资源设置，例如 Xft DPI。",
+      "contents": [
+        "desktop/xorg/Xresources"
+      ],
+      "dependencies": [
+        {
+          "kind": "command",
+          "name": "xrdb",
+          "required": true,
+          "arch": "xorg-xrdb",
+          "debian": "x11-xserver-utils"
+        }
+      ]
+    },
+    "xorg-xinitrc": {
+      "description": "startx 启动脚本，加载 Xresources/Xmodmap 并启动桌面会话。",
+      "contents": [
+        "desktop/xorg/xinitrc"
+      ],
+      "dependencies": [
+        {
+          "kind": "command",
+          "name": "xrdb",
+          "required": true,
+          "arch": "xorg-xrdb",
+          "debian": "x11-xserver-utils"
+        },
+        {
+          "kind": "command",
+          "name": "xmodmap",
+          "required": true,
+          "arch": "xorg-xmodmap",
+          "debian": "x11-xserver-utils"
+        }
+      ]
+    },
+    "xorg-xsession": {
+      "description": "X 会话入口，当前启动 GNOME Session。",
+      "contents": [
+        "desktop/xorg/xsession"
+      ],
+      "dependencies": [
+        {
+          "kind": "command",
+          "name": "gnome-session",
+          "required": true,
+          "arch": "gnome-session",
+          "debian": "gnome-session"
+        }
+      ]
+    },
+    "xorg-fehbg": {
+      "description": "使用 feh 设置桌面壁纸，图片来自 assets/wallpapers。",
+      "contents": [
+        "desktop/xorg/fehbg",
+        "assets/wallpapers/desktop-wallpaper.png"
+      ],
+      "dependencies": [
+        {
+          "kind": "command",
+          "name": "feh",
+          "required": true,
+          "arch": "feh",
+          "debian": "feh"
+        }
+      ]
+    },
+    "xorg-modmap": {
+      "description": "额外的键盘映射配置。",
+      "contents": [
+        "desktop/xorg/modmap"
+      ],
+      "dependencies": [
+        {
+          "kind": "command",
+          "name": "xmodmap",
+          "required": true,
+          "arch": "xorg-xmodmap",
+          "debian": "x11-xserver-utils"
+        }
+      ]
+    },
+    "xorg-xclients": {
+      "description": "XDM/GDM/KDM 登录时启动 xinitrc 的包装脚本。",
+      "contents": [
+        "desktop/xorg/Xclients"
+      ],
+      "dependencies": [
+        {
+          "kind": "command",
+          "name": "bash",
+          "required": true,
+          "arch": "bash",
+          "debian": "bash"
+        }
+      ]
+    },
+    "shell-dir-colors": {
+      "description": "终端 ls/dircolors 配色定义。",
+      "contents": [
+        "shell/dir_colors"
+      ],
+      "dependencies": [
+        {
+          "kind": "command",
+          "name": "dircolors",
+          "required": false,
+          "arch": "coreutils",
+          "debian": "coreutils"
+        }
+      ]
+    },
+    "shell-logout": {
+      "description": "Bash 登录 shell 退出时执行的配置。",
+      "contents": [
+        "shell/bash_logout"
+      ],
+      "dependencies": [
+        {
+          "kind": "command",
+          "name": "bash",
+          "required": true,
+          "arch": "bash",
+          "debian": "bash"
+        }
+      ]
+    },
+    "terminal-alacritty": {
+      "description": "Alacritty 终端配置，使用 SauceCodePro Nerd Font Mono。",
+      "contents": [
+        "terminal/alacritty/alacritty.toml",
+        "terminal/alacritty/README.md"
+      ],
+      "dependencies": [
+        {
+          "kind": "command",
+          "name": "alacritty",
+          "required": true,
+          "arch": "alacritty",
+          "debian": "alacritty"
+        },
+        {
+          "kind": "font",
+          "name": "SauceCodePro Nerd Font Mono",
+          "required": true
+        }
+      ],
+      "notes": "字体缺失时终端仍可启动，但 Nerd Font 图标可能显示为方框。"
+    },
+    "terminal-wezterm": {
+      "description": "WezTerm 跨平台终端配置，保留 docs、examples 和 scripts。",
+      "contents": [
+        "terminal/wezterm/wezterm.lua",
+        "terminal/wezterm/utils",
+        "terminal/wezterm/docs",
+        "terminal/wezterm/examples",
+        "terminal/wezterm/scripts"
+      ],
+      "dependencies": [
+        {
+          "kind": "command",
+          "name": "wezterm",
+          "required": true,
+          "arch": "wezterm",
+          "debian": "wezterm"
+        },
+        {
+          "kind": "command",
+          "name": "mdcat",
+          "required": false,
+          "arch": null,
+          "debian": null
+        },
+        {
+          "kind": "font",
+          "name": "JetBrainsMono Nerd Font Mono",
+          "required": true
+        }
+      ],
+      "related": [
+        "font-jetbrainsmono"
+      ],
+      "notes": "字体从 assets/fonts/JetBrainsMono 加载；mdcat 仅用于终端图片/Markdown 辅助。"
+    },
+    "terminal-tmux": {
+      "description": "tmux 终端复用器配置。",
+      "contents": [
+        "terminal/tmux/tmux.conf"
+      ],
+      "dependencies": [
+        {
+          "kind": "command",
+          "name": "tmux",
+          "required": true,
+          "arch": "tmux",
+          "debian": "tmux"
+        }
+      ]
+    },
+    "desktop-i3": {
+      "description": "i3 窗口管理器主配置，包含快捷键、Polybar 启动、截图、锁屏、触控板和显示器位置处理。",
+      "contents": [
+        "desktop/i3/config",
+        "desktop/i3/brightness",
+        "desktop/i3/display-position",
+        "desktop/i3/lock",
+        "desktop/i3/screenshot",
+        "desktop/i3/scripts"
+      ],
+      "related": [
+        "i3-screen-off",
+        "i3-betterlockscreen",
+        "i3-lock-screen",
+        "i3-display-position"
+      ],
+      "dependencies": [
+        {
+          "kind": "command",
+          "name": "i3",
+          "required": true,
+          "arch": "i3-wm",
+          "debian": "i3-wm"
+        },
+        {
+          "kind": "command",
+          "name": "i3-msg",
+          "required": true,
+          "arch": "i3-wm",
+          "debian": "i3-wm"
+        },
+        {
+          "kind": "command",
+          "name": "feh",
+          "required": true,
+          "arch": "feh",
+          "debian": "feh"
+        },
+        {
+          "kind": "command",
+          "name": "polybar",
+          "required": true,
+          "arch": "polybar",
+          "debian": "polybar"
+        },
+        {
+          "kind": "command",
+          "name": "alacritty",
+          "required": true,
+          "arch": "alacritty",
+          "debian": "alacritty"
+        },
+        {
+          "kind": "command",
+          "name": "dmenu",
+          "required": false,
+          "arch": "dmenu",
+          "debian": "dmenu"
+        },
+        {
+          "kind": "command",
+          "name": "xmodmap",
+          "required": true,
+          "arch": "xorg-xmodmap",
+          "debian": "x11-xserver-utils"
+        },
+        {
+          "kind": "command",
+          "name": "xset",
+          "required": true,
+          "arch": "xorg-xset",
+          "debian": "x11-xserver-utils"
+        },
+        {
+          "kind": "command",
+          "name": "xinput",
+          "required": true,
+          "arch": "xorg-xinput",
+          "debian": "xinput"
+        },
+        {
+          "kind": "command",
+          "name": "scrot",
+          "required": true,
+          "arch": "scrot",
+          "debian": "scrot"
+        },
+        {
+          "kind": "command",
+          "name": "xclip",
+          "required": true,
+          "arch": "xclip",
+          "debian": "xclip"
+        },
+        {
+          "kind": "command",
+          "name": "convert",
+          "required": true,
+          "arch": "imagemagick",
+          "debian": "imagemagick"
+        },
+        {
+          "kind": "command",
+          "name": "bc",
+          "required": true,
+          "arch": "bc",
+          "debian": "bc"
+        },
+        {
+          "kind": "command",
+          "name": "chromium",
+          "required": false,
+          "arch": "chromium",
+          "debian": "chromium"
+        },
+        {
+          "kind": "command",
+          "name": "ranger",
+          "required": true,
+          "arch": "ranger",
+          "debian": "ranger"
+        },
+        {
+          "kind": "command",
+          "name": "i3lock",
+          "required": true,
+          "arch": "i3lock",
+          "debian": "i3lock"
+        },
+        {
+          "kind": "command",
+          "name": "xrandr",
+          "required": true,
+          "arch": "xorg-xrandr",
+          "debian": "x11-xserver-utils"
+        },
+        {
+          "kind": "command",
+          "name": "xbacklight",
+          "required": false,
+          "arch": "xorg-xbacklight",
+          "debian": "xbacklight"
+        },
+        {
+          "kind": "command",
+          "name": "ibus-daemon",
+          "required": true,
+          "arch": "ibus",
+          "debian": "ibus"
+        }
+      ],
+      "notes": "i3 本身不绘制 GTK 桌面图标；Ranger/终端中的 Nerd Font 图标由字体提供。"
+    },
+    "desktop-compton": {
+      "description": "Compton 窗口合成器配置。",
+      "contents": [
+        "desktop/compton/compton"
+      ],
+      "dependencies": [
+        {
+          "kind": "command",
+          "name": "compton",
+          "required": true,
+          "arch": "compton",
+          "debian": "compton"
+        }
+      ]
+    },
+    "desktop-polybar": {
+      "description": "Polybar 状态栏配置和启动脚本。",
+      "contents": [
+        "desktop/polybar/config",
+        "desktop/polybar/launch.sh"
+      ],
+      "dependencies": [
+        {
+          "kind": "command",
+          "name": "polybar",
+          "required": true,
+          "arch": "polybar",
+          "debian": "polybar"
+        },
+        {
+          "kind": "command",
+          "name": "i3",
+          "required": true,
+          "arch": "i3-wm",
+          "debian": "i3-wm"
+        },
+        {
+          "kind": "font",
+          "name": "siji",
+          "required": true
+        },
+        {
+          "kind": "font",
+          "name": "unifont",
+          "required": true
+        }
+      ]
+    },
+    "desktop-autostart": {
+      "description": "桌面自启动 .desktop 项。",
+      "contents": [
+        "desktop/autostart/ignore-lid-switch-tweak.desktop",
+        "desktop/autostart/msm_notifier.desktop"
+      ],
+      "dependencies": []
+    },
+    "desktop-qtcreator-launcher": {
+      "description": "Qt Creator 应用菜单启动器，安装到 ~/.local/share/applications。",
+      "contents": [
+        "desktop/gnome/桌面图标/Qt_create.desktop"
+      ],
+      "dependencies": [
+        {
+          "kind": "command",
+          "name": "qtcreator",
+          "required": false,
+          "arch": "qtcreator",
+          "debian": "qtcreator"
+        },
+        {
+          "kind": "command",
+          "name": "desktop-file-validate",
+          "required": false,
+          "arch": "desktop-file-utils",
+          "debian": "desktop-file-utils"
+        },
+        {
+          "kind": "command",
+          "name": "update-desktop-database",
+          "required": false,
+          "arch": "desktop-file-utils",
+          "debian": "desktop-file-utils"
+        }
+      ],
+      "notes": ".desktop 中的 Qt Creator 路径需要与机器上的实际安装路径一致。"
+    },
+    "input-rime": {
+      "description": "IBus Rime 输入法配置、词典和配色。",
+      "contents": [
+        "input-method/rime/default.custom.yaml",
+        "input-method/rime/luna_pinyin.custom.yaml",
+        "input-method/rime/wubi86_jidian",
+        "input-method/rime/color_schemes"
+      ],
+      "dependencies": [
+        {
+          "kind": "command",
+          "name": "ibus",
+          "required": true,
+          "arch": "ibus",
+          "debian": "ibus"
+        },
+        {
+          "kind": "command",
+          "name": "ibus-daemon",
+          "required": true,
+          "arch": "ibus",
+          "debian": "ibus"
+        }
+      ],
+      "notes": "需要系统安装 ibus-rime；运行数据 build、sync 和 userdb 已排除出版本控制。"
+    },
+    "file-ranger": {
+      "description": "Ranger 文件管理器配置、预览脚本和 devicons 插件。",
+      "contents": [
+        "file-manager/ranger/rc.conf",
+        "file-manager/ranger/scope.sh",
+        "file-manager/ranger/commands.py",
+        "file-manager/ranger/plugins"
+      ],
+      "related": [
+        "font-jetbrainsmono"
+      ],
+      "dependencies": [
+        {
+          "kind": "command",
+          "name": "ranger",
+          "required": true,
+          "arch": "ranger",
+          "debian": "ranger"
+        },
+        {
+          "kind": "command",
+          "name": "python3",
+          "required": true,
+          "arch": "python",
+          "debian": "python3"
+        },
+        {
+          "kind": "command",
+          "name": "file",
+          "required": true,
+          "arch": "file",
+          "debian": "file"
+        },
+        {
+          "kind": "command",
+          "name": "w3m",
+          "required": false,
+          "arch": "w3m",
+          "debian": "w3m"
+        },
+        {
+          "kind": "command",
+          "name": "pdftoppm",
+          "required": false,
+          "arch": "poppler",
+          "debian": "poppler-utils"
+        },
+        {
+          "kind": "command",
+          "name": "convert",
+          "required": false,
+          "arch": "imagemagick",
+          "debian": "imagemagick"
+        },
+        {
+          "kind": "command",
+          "name": "ffmpegthumbnailer",
+          "required": false,
+          "arch": "ffmpegthumbnailer",
+          "debian": "ffmpegthumbnailer"
+        },
+        {
+          "kind": "command",
+          "name": "chafa",
+          "required": false,
+          "arch": "chafa",
+          "debian": "chafa"
+        },
+        {
+          "kind": "command",
+          "name": "bat",
+          "required": false,
+          "arch": "bat",
+          "debian": "bat"
+        },
+        {
+          "kind": "command",
+          "name": "highlight",
+          "required": false,
+          "arch": "highlight",
+          "debian": "highlight"
+        },
+        {
+          "kind": "command",
+          "name": "atool",
+          "required": false,
+          "arch": "atool",
+          "debian": "atool"
+        },
+        {
+          "kind": "command",
+          "name": "unrar",
+          "required": false,
+          "arch": "unrar",
+          "debian": "unrar"
+        },
+        {
+          "kind": "command",
+          "name": "7z",
+          "required": false,
+          "arch": "p7zip",
+          "debian": "p7zip-full"
+        },
+        {
+          "kind": "command",
+          "name": "mediainfo",
+          "required": false,
+          "arch": "mediainfo",
+          "debian": "mediainfo"
+        },
+        {
+          "kind": "font",
+          "name": "JetBrainsMono Nerd Font Mono",
+          "required": true
+        }
+      ],
+      "notes": "devicons 和终端图标依赖 Nerd Font；预览工具缺失时 Ranger 仍可用，但部分预览不可用。"
+    },
+    "i3-screen-off": {
+      "description": "立即关闭屏幕的 i3 辅助命令。",
+      "contents": [
+        "desktop/i3/brightness/screen_off.sh"
+      ],
+      "dependencies": [
+        {
+          "kind": "command",
+          "name": "xset",
+          "required": true,
+          "arch": "xorg-xset",
+          "debian": "x11-xserver-utils"
+        }
+      ]
+    },
+    "i3-betterlockscreen": {
+      "description": "基于 i3lock 的锁屏辅助脚本。",
+      "contents": [
+        "desktop/i3/lock/betterlockscreen"
+      ],
+      "dependencies": [
+        {
+          "kind": "command",
+          "name": "i3lock",
+          "required": true,
+          "arch": "i3lock",
+          "debian": "i3lock"
+        },
+        {
+          "kind": "command",
+          "name": "convert",
+          "required": true,
+          "arch": "imagemagick",
+          "debian": "imagemagick"
+        },
+        {
+          "kind": "command",
+          "name": "bc",
+          "required": true,
+          "arch": "bc",
+          "debian": "bc"
+        },
+        {
+          "kind": "command",
+          "name": "xrandr",
+          "required": true,
+          "arch": "xorg-xrandr",
+          "debian": "x11-xserver-utils"
+        },
+        {
+          "kind": "command",
+          "name": "xset",
+          "required": true,
+          "arch": "xorg-xset",
+          "debian": "x11-xserver-utils"
+        }
+      ]
+    },
+    "i3-lock-screen": {
+      "description": "使用锁屏壁纸和 i3lock 的锁屏命令。",
+      "contents": [
+        "desktop/i3/lock/lock-screen.sh",
+        "assets/wallpapers/lockscreen-wallpaper.png"
+      ],
+      "dependencies": [
+        {
+          "kind": "command",
+          "name": "i3lock",
+          "required": true,
+          "arch": "i3lock",
+          "debian": "i3lock"
+        },
+        {
+          "kind": "command",
+          "name": "xset",
+          "required": true,
+          "arch": "xorg-xset",
+          "debian": "x11-xserver-utils"
+        }
+      ]
+    },
+    "i3-display-position": {
+      "description": "切换 HDMI 显示器相对位置的 i3 命令，并持久化配置。",
+      "contents": [
+        "desktop/i3/display-position/i3-display-position",
+        "desktop/i3/display-position/dual-display.sh",
+        "desktop/i3/display-position/dual-display.conf"
+      ],
+      "dependencies": [
+        {
+          "kind": "command",
+          "name": "xrandr",
+          "required": true,
+          "arch": "xorg-xrandr",
+          "debian": "x11-xserver-utils"
+        },
+        {
+          "kind": "command",
+          "name": "i3-msg",
+          "required": true,
+          "arch": "i3-wm",
+          "debian": "i3-wm"
+        },
+        {
+          "kind": "command",
+          "name": "dmenu",
+          "required": false,
+          "arch": "dmenu",
+          "debian": "dmenu"
+        },
+        {
+          "kind": "command",
+          "name": "awk",
+          "required": true,
+          "arch": "gawk",
+          "debian": "gawk"
+        },
+        {
+          "kind": "command",
+          "name": "flock",
+          "required": true,
+          "arch": "util-linux",
+          "debian": "util-linux"
+        },
+        {
+          "kind": "command",
+          "name": "pkill",
+          "required": true,
+          "arch": "procps-ng",
+          "debian": "procps"
+        }
+      ]
+    },
+    "doc-zathura": {
+      "description": "Zathura PDF 阅读器配置。",
+      "contents": [
+        "documents/zathura/zathurarc"
+      ],
+      "dependencies": [
+        {
+          "kind": "command",
+          "name": "zathura",
+          "required": true,
+          "arch": "zathura",
+          "debian": "zathura"
+        },
+        {
+          "kind": "command",
+          "name": "zathura-pdf-poppler",
+          "required": false,
+          "arch": "zathura-pdf-poppler",
+          "debian": "zathura-pdf-poppler"
+        }
+      ]
+    },
+    "doc-latexmk": {
+      "description": "LaTeX 编译和语法检查配置。",
+      "contents": [
+        "documents/latexmk/latexmkrc",
+        "documents/latexmk/texcheck.sh"
+      ],
+      "dependencies": [
+        {
+          "kind": "command",
+          "name": "latexmk",
+          "required": true,
+          "arch": "texlive-core",
+          "debian": "latexmk"
+        },
+        {
+          "kind": "command",
+          "name": "pdflatex",
+          "required": true,
+          "arch": "texlive-core",
+          "debian": "texlive-latex-base"
+        },
+        {
+          "kind": "command",
+          "name": "xelatex",
+          "required": false,
+          "arch": "texlive-xetex",
+          "debian": "texlive-xetex"
+        },
+        {
+          "kind": "command",
+          "name": "chktex",
+          "required": false,
+          "arch": "chktex",
+          "debian": "chktex"
+        }
+      ]
+    },
+    "editor-vscode-settings": {
+      "description": "VS Code 用户设置。",
+      "contents": [
+        "editors/vscode/settings.json"
+      ],
+      "related": [
+        "editor-vscode-snippets"
+      ],
+      "dependencies": [
+        {
+          "kind": "command",
+          "name": "code",
+          "required": false,
+          "arch": "code",
+          "debian": "code"
+        }
+      ],
+      "notes": "只管理设置文件，不管理 VS Code 的 History、workspaceStorage 和 globalStorage。"
+    },
+    "editor-vscode-snippets": {
+      "description": "VS Code 自定义代码片段。",
+      "contents": [
+        "editors/vscode/snippets"
+      ],
+      "related": [
+        "editor-vscode-settings"
+      ],
+      "dependencies": [
+        {
+          "kind": "command",
+          "name": "code",
+          "required": false,
+          "arch": "code",
+          "debian": "code"
+        }
+      ]
+    },
+    "font-jetbrainsmono": {
+      "description": "共享 JetBrainsMono Nerd Font，供 WezTerm、Ranger 等使用。",
+      "contents": [
+        "assets/fonts/JetBrainsMono/JetBrainsMonoNerdFontMono-Regular.ttf"
+      ],
+      "dependencies": [
+        {
+          "kind": "command",
+          "name": "fc-cache",
+          "required": true,
+          "arch": "fontconfig",
+          "debian": "fontconfig"
+        },
+        {
+          "kind": "command",
+          "name": "fc-match",
+          "required": true,
+          "arch": "fontconfig",
+          "debian": "fontconfig"
+        }
+      ]
+    },
+    "shell-bashrc": {
+      "description": "Bash 交互式配置。现有 .bashrc 通过受管理 source 块接入，不直接覆盖发行版默认文件。",
+      "contents": [
+        "shell/bashrc"
+      ],
+      "dependencies": [
+        {
+          "kind": "command",
+          "name": "bash",
+          "required": true,
+          "arch": "bash",
+          "debian": "bash"
+        }
+      ]
+    },
+    "shell-bash-profile": {
+      "description": "Bash 登录配置。现有 .bash_profile 通过受管理 source 块接入。",
+      "contents": [
+        "shell/bash_profile"
+      ],
+      "dependencies": [
+        {
+          "kind": "command",
+          "name": "bash",
+          "required": true,
+          "arch": "bash",
+          "debian": "bash"
+        }
+      ]
+    },
+    "shell-profile": {
+      "description": "POSIX 登录配置。现有 .profile 通过受管理 source 块接入。",
+      "contents": [
+        "shell/profile"
+      ],
+      "dependencies": [
+        {
+          "kind": "command",
+          "name": "bash",
+          "required": true,
+          "arch": "bash",
+          "debian": "bash"
+        }
+      ]
+    },
+    "shell-zshrc": {
+      "description": "Zsh 交互式配置，安装时通过受管理 source 块接入已有 .zshrc。",
+      "contents": [
+        "shell/zshrc"
+      ],
+      "dependencies": [
+        {
+          "kind": "command",
+          "name": "zsh",
+          "required": false,
+          "arch": "zsh",
+          "debian": "zsh"
+        }
+      ]
+    },
+    "git-include": {
+      "description": "全局 Git include 配置，通过 .gitconfig 的 include 块接入。",
+      "contents": [
+        "git/gitconfig"
+      ],
+      "dependencies": [
+        {
+          "kind": "command",
+          "name": "git",
+          "required": true,
+          "arch": "git",
+          "debian": "git"
+        },
+        {
+          "kind": "command",
+          "name": "git-lfs",
+          "required": false,
+          "arch": "git-lfs",
+          "debian": "git-lfs"
+        }
+      ],
+      "notes": "机器专属用户名、邮箱和代理可以继续保留在 ~/.gitconfig。"
+    }
+  }
+}
