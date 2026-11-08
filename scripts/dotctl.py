@@ -12,6 +12,7 @@ import difflib
 import json
 import locale
 import os
+import shlex
 import shutil
 import subprocess
 import sys
@@ -583,7 +584,7 @@ class DotfilesTUI:
             message_attr = self.pair(PAIR_GREEN if self.message_ok else PAIR_RED) | curses.A_BOLD
             self.addstr(height - 3, 2, clip_text(self.message, max(0, width - 4)), message_attr)
 
-        footer = "↑/↓ 移动  Enter 详情  i 安装/合并  d 差异  o 覆盖  a 全部安装  r 刷新  q/ESC 退出"
+        footer = "↑/↓ 移动  Enter 详情  e 编辑  i 安装/合并  d 差异  o 覆盖  a 全部安装  r 刷新  q/ESC 退出"
         self.addstr(height - 1, 1, clip_text(footer, max(0, width - 2)), self.pair(PAIR_GRAY))
         self.stdscr.refresh()
 
@@ -633,19 +634,18 @@ class DotfilesTUI:
 
     def detail_body(self, item: Item, status: Status) -> str:
         if status.code == STATUS_INSTALLED:
-            action = "已安装。按 d 可查看源与当前目标之间的差异。"
+            action = "已安装。按 e 编辑仓库源文件，按 d 查看源与当前目标之间的差异。"
         elif status.code == STATUS_SOURCE:
             action = "源文件缺失，请先修复仓库内容。"
         elif item.kind == "link":
             action = (
-                "按 i 接管为软链接；按 o 强制覆盖为软链接；按 d 查看源与现有目标的差异。\n"
-                "发生冲突时，旧目标会先备份到 ~/.dotfile-backups/。"
+                "按 e 编辑仓库源文件；按 i 接管为软链接；按 o 强制覆盖为软链接；\n"
+                "按 d 查看源与现有目标的差异。发生冲突时，旧目标会先备份。"
             )
         else:
             action = (
-                "按 i 合并：保留原内容并在末尾追加受管理块；\n"
-                "按 o 覆盖：备份原文件后替换为受管理 shim；\n"
-                "按 d 查看当前目标与仓库配置的差异。"
+                "按 e 编辑仓库源文件；按 i 合并：保留原内容并追加受管理块；\n"
+                "按 o 覆盖：备份原文件后替换为受管理 shim；按 d 查看差异。"
             )
 
         actual = ""
@@ -682,13 +682,18 @@ class DotfilesTUI:
                     break
                 self.addstr(y, 2, line, self.pair(PAIR_GRAY))
                 y += 1
-            footer = "i 安装/合并   o 覆盖   d 差异   a 全部安装   ESC 返回"
+            if self.message and height >= 3:
+                attr = self.pair(PAIR_GREEN if self.message_ok else PAIR_RED) | curses.A_BOLD
+                self.addstr(height - 2, 1, clip_text(self.message, max(0, width - 2)), attr)
+            footer = "e 编辑   i 安装/合并   o 覆盖   d 差异   a 全部安装   ESC 返回"
             self.addstr(height - 1, 1, clip_text(footer, max(0, width - 2)), self.pair(PAIR_GRAY))
             self.stdscr.refresh()
             ch = self.stdscr.getch()
             if ch in (27, ord("q"), curses.KEY_LEFT):
                 return
-            if ch in (ord("i"), ord("I")):
+            if ch in (ord("e"), ord("E")):
+                self.edit_source(item)
+            elif ch in (ord("i"), ord("I")):
                 self.install_selected(item)
             elif ch in (ord("o"), ord("O")):
                 self.install_selected(item, overwrite=True)
@@ -730,6 +735,64 @@ class DotfilesTUI:
             self.message_ok = changed
         except Exception as exc:
             self.message = f"安装失败: {exc}"
+            self.message_ok = False
+        self.refresh()
+
+    def edit_source(self, item: Item) -> None:
+        path = item.source
+        if not path.exists() and not path.is_symlink():
+            self.message = f"源文件不存在，无法编辑: {path}"
+            self.message_ok = False
+            return
+
+        raw_editor = (
+            os.environ.get("EDITOR")
+            or os.environ.get("VISUAL")
+            or os.environ.get("EDITER")
+            or "vim"
+        )
+        try:
+            command = shlex.split(raw_editor)
+        except ValueError as exc:
+            self.message = f"编辑器命令无效: {exc}"
+            self.message_ok = False
+            return
+        if not command:
+            self.message = "编辑器命令为空"
+            self.message_ok = False
+            return
+        if shutil.which(command[0]) is None:
+            self.message = f"找不到编辑器: {command[0]}"
+            self.message_ok = False
+            return
+
+        curses.def_prog_mode()
+        curses.endwin()
+        error: str | None = None
+        returncode = 1
+        try:
+            result = subprocess.run(
+                command + [os.fspath(path)],
+                cwd=os.fspath(REPO),
+            )
+            returncode = result.returncode
+        except Exception as exc:
+            error = str(exc)
+        finally:
+            curses.reset_prog_mode()
+            try:
+                self.stdscr.refresh()
+            except curses.error:
+                pass
+
+        if error:
+            self.message = f"编辑器启动失败: {error}"
+            self.message_ok = False
+        elif returncode == 0:
+            self.message = f"已编辑: {path}"
+            self.message_ok = True
+        else:
+            self.message = f"编辑器退出码: {returncode}"
             self.message_ok = False
         self.refresh()
 
@@ -807,6 +870,10 @@ class DotfilesTUI:
                 if item:
                     self.show_detail(item)
                     self.refresh()
+            elif ch in (ord("e"), ord("E")):
+                item = self.selected_item()
+                if item:
+                    self.edit_source(item)
             elif ch in (ord("i"), ord("I")):
                 item = self.selected_item()
                 if item:

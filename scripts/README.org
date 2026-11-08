@@ -16,3 +16,8 @@ Run:
 =dotctl= also manages the i3 helper commands previously installed by the
 removed i3 =install.sh= scripts. Conflict items can be inspected with =d= and
 overwritten with =o= after an automatic backup.
+
+
+Press =e= in the list or detail page to edit the repository source file with
+=$EDITOR= (fallback: =$VISUAL=, then =vim=). The curses screen is suspended and
+restored when the editor exits.

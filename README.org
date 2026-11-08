@@ -79,6 +79,7 @@ Python 标准库和 curses，不依赖第三方 Python 包。
 按键：
 - 上/下：移动
 - Enter：查看配置详情
+- e：使用编辑器打开仓库源文件
 - i：安装或合并选中项
 - d：查看源文件与当前目标的差异
 - o：备份并覆盖为受管理配置
@@ -86,6 +87,9 @@ Python 标准库和 curses，不依赖第三方 Python 包。
 - r：刷新状态
 - ESC：返回上一级；首层按 ESC 退出
 - q：退出
+
+编辑功能优先使用 =$EDITOR=，其次 =$VISUAL=，未设置时回退到 =vim=。
+编辑器退出后会自动恢复管理器界面并刷新配置状态。
 
 i3 的 =screen_off=、=betterlockscreen=、=lock-screen= 和
 =i3-display-position= 也已纳入 =dotctl=，不再维护单独的 =install.sh=。
