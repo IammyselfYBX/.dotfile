@@ -30,3 +30,8 @@ checks run when a detail page is opened.
 
 Press =a= to show a scrollable preflight plan before running bootstrap. The plan
 lists every pending item, every conflict and the action that will be performed.
+
+
+Press =h= in the list or detail page to open the selected item's =doc/wiki.md=
+with =$PAGER= (fallback: =less -R=). The curses screen is suspended and restored
+when the pager exits.

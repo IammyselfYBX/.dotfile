@@ -164,6 +164,21 @@ def build_items() -> list[Item]:
     return items
 
 
+def wiki_path(item: Item) -> Path:
+    exact = {
+        "desktop-qtcreator-launcher": REPO / "desktop/gnome/doc/wiki.md",
+        "editor-vscode-settings": REPO / "editors/vscode/doc/wiki.md",
+        "editor-vscode-snippets": REPO / "editors/vscode/doc/wiki.md",
+    }
+    if item.item_id in exact:
+        return exact[item.item_id]
+    if item.item_id.startswith("i3-"):
+        return REPO / "desktop/i3/doc/wiki.md"
+    if item.source.is_dir():
+        return item.source / "doc/wiki.md"
+    return item.source.parent / "doc/wiki.md"
+
+
 def symlink_points_to(target: Path, source: Path) -> bool:
     if not target.is_symlink():
         return False
@@ -666,7 +681,7 @@ class DotfilesTUI:
             message_attr = self.pair(PAIR_GREEN if self.message_ok else PAIR_RED) | curses.A_BOLD
             self.addstr(height - 3, 2, clip_text(self.message, max(0, width - 4)), message_attr)
 
-        footer = "↑/↓ 移动  Enter 详情  e 编辑  i 安装/合并  d 差异  o 覆盖  a 全部安装  r 刷新  q/ESC 退出"
+        footer = "↑/↓ 移动  Enter 详情  e 编辑  h 文档  i 安装/合并  d 差异  o 覆盖  a 全部安装  r 刷新  q/ESC 退出"
         self.addstr(height - 1, 1, clip_text(footer, max(0, width - 2)), self.pair(PAIR_GRAY))
         self.stdscr.refresh()
 
@@ -731,6 +746,7 @@ class DotfilesTUI:
         source_type = "目录" if item.source.is_dir() else "文件"
         lines.append((f"源类型: {source_type}", PAIR_GRAY, False))
         lines.append((f"目标: {item.target}", PAIR_GRAY, False))
+        lines.append((f"文档: {wiki_path(item)}", PAIR_GRAY, False))
         if item.target.is_symlink():
             try:
                 lines.append((f"当前软链接 -> {os.readlink(item.target)}", PAIR_GRAY, False))
@@ -808,13 +824,13 @@ class DotfilesTUI:
         lines.append(("", PAIR_GRAY, False))
         lines.append(("操作:", PAIR_CYAN, True))
         if status.code == STATUS_INSTALLED:
-            lines.append(("e 编辑源文件；d 查看差异。", PAIR_GRAY, False))
+            lines.append(("e 编辑源文件；h 查看 doc/wiki.md；d 查看差异。", PAIR_GRAY, False))
         elif status.code == STATUS_SOURCE:
             lines.append(("源文件缺失，请先修复仓库内容。", PAIR_RED, False))
         elif item.kind == "link":
-            lines.append(("e 编辑源文件；i 接管为软链接；o 强制覆盖；d 查看差异。", PAIR_GRAY, False))
+            lines.append(("e 编辑源文件；h 查看文档；i 接管为软链接；o 强制覆盖；d 查看差异。", PAIR_GRAY, False))
         else:
-            lines.append(("e 编辑源文件；i 合并（保留原内容）；o 覆盖为 shim；d 查看差异。", PAIR_GRAY, False))
+            lines.append(("e 编辑源文件；h 查看文档；i 合并（保留原内容）；o 覆盖为 shim；d 查看差异。", PAIR_GRAY, False))
         return lines
 
     def show_detail(self, item: Item) -> None:
@@ -847,7 +863,7 @@ class DotfilesTUI:
             if self.message and height >= 3:
                 attr = self.pair(PAIR_GREEN if self.message_ok else PAIR_RED) | curses.A_BOLD
                 self.addstr(height - 2, 1, clip_text(self.message, max(0, width - 2)), attr)
-            footer = "↑/↓ 滚动  e 编辑  i 安装/合并  o 覆盖  d 差异  a 全部安装  ESC 返回"
+            footer = "↑/↓ 滚动  e 编辑  h 文档  i 安装/合并  o 覆盖  d 差异  a 全部安装  ESC 返回"
             self.addstr(height - 1, 1, clip_text(footer, max(0, width - 2)), self.pair(PAIR_GRAY))
             self.stdscr.refresh()
             ch = self.stdscr.getch()
@@ -863,6 +879,8 @@ class DotfilesTUI:
                 offset = min(max(0, len(rendered) - visible), offset + visible)
             elif ch in (ord("e"), ord("E")):
                 self.edit_source(item)
+            elif ch in (ord("h"), ord("H")):
+                self.view_wiki(item)
             elif ch in (ord("i"), ord("I")):
                 self.install_selected(item)
             elif ch in (ord("o"), ord("O")):
@@ -871,6 +889,62 @@ class DotfilesTUI:
                 self.show_diff(item)
             elif ch in (ord("a"), ord("A")):
                 self.install_all()
+
+    def view_wiki(self, item: Item) -> None:
+        path = wiki_path(item)
+        if not path.is_file():
+            self.message = f"未找到文档: {path}"
+            self.message_ok = False
+            return
+
+        raw_pager = os.environ.get("PAGER") or "less -R"
+        try:
+            command = shlex.split(raw_pager)
+        except ValueError as exc:
+            self.message = f"分页器命令无效: {exc}"
+            self.message_ok = False
+            return
+        if not command:
+            command = ["less", "-R"]
+        if shutil.which(command[0]) is None:
+            fallback_editor = os.environ.get("EDITOR") or os.environ.get("VISUAL") or "vim"
+            command = shlex.split(fallback_editor)
+        if not command or shutil.which(command[0]) is None:
+            self.message = f"找不到分页器或编辑器，文档位于: {path}"
+            self.message_ok = False
+            return
+
+        curses.def_prog_mode()
+        curses.endwin()
+        error: str | None = None
+        returncode = 1
+        try:
+            env = os.environ.copy()
+            env.setdefault("LESS", "-R")
+            result = subprocess.run(
+                command + [os.fspath(path)],
+                cwd=os.fspath(REPO),
+                env=env,
+            )
+            returncode = result.returncode
+        except Exception as exc:
+            error = str(exc)
+        finally:
+            curses.reset_prog_mode()
+            try:
+                self.stdscr.refresh()
+            except curses.error:
+                pass
+
+        if error:
+            self.message = f"文档查看失败: {error}"
+            self.message_ok = False
+        elif returncode == 0:
+            self.message = f"已查看文档: {path}"
+            self.message_ok = True
+        else:
+            self.message = f"分页器退出码: {returncode}"
+            self.message_ok = False
 
     def edit_source(self, item: Item) -> None:
         path = item.source
@@ -1087,6 +1161,10 @@ class DotfilesTUI:
                 item = self.selected_item()
                 if item:
                     self.edit_source(item)
+            elif ch in (ord("h"), ord("H")):
+                item = self.selected_item()
+                if item:
+                    self.view_wiki(item)
             elif ch in (ord("i"), ord("I")):
                 item = self.selected_item()
                 if item:

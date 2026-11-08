@@ -21,3 +21,8 @@ fast and does not require network access.
 
 When adding a managed item or a new runtime dependency, update this file in the
 same commit.
+
+
+Each managed configuration directory also contains a =doc/wiki.md=. =dotctl=
+opens the relevant wiki when =h= is pressed. The i3 wiki contains the complete
+current shortcut reference and related helper-command documentation.
