@@ -1,0 +1,6 @@
+* Package references
+- =pacman-explicit.txt=: explicitly installed Arch/Manjaro packages
+- =vscode-extensions.txt=: installed VS Code extensions, if available
+
+These lists are references, not an automatic destructive installer. Review them
+on the target machine before installing packages.

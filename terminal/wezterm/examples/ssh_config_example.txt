@@ -1,0 +1,19 @@
+Host bastion
+    HostName bastion.example.com
+    User jumpuser
+    Port 11988
+    IdentityFile ~/.ssh/id_ed25519
+    IdentitiesOnly yes
+    ServerAliveInterval 30
+    ServerAliveCountMax 3
+
+Host work
+    HostName 203.0.113.10
+    Port 2223
+    User deploy
+    IdentityFile ~/.ssh/id_ed25519
+    IdentitiesOnly yes
+    ProxyCommand C:/Windows/System32/OpenSSH/ssh.exe -q -W %h:%p bastion
+    RequestTTY yes
+    ServerAliveInterval 30
+    ServerAliveCountMax 3

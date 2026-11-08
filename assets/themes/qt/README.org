@@ -1,0 +1,1 @@
+Place Qt theme configuration or shared assets here.

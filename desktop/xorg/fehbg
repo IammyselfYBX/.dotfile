@@ -1,0 +1,2 @@
+#!/bin/sh
+feh --no-fehbg --bg-fill "$HOME/.dotfile/assets/wallpapers/desktop-wallpaper.png" 

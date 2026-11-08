@@ -1,0 +1,4 @@
+* Editors
+- =vscode/=: VS Code settings, keybindings and snippets
+- Vim is intentionally managed by a separate repository at =~/.vim=.
+  This repository does not modify or link Vim configuration.

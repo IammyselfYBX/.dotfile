@@ -1,0 +1,10 @@
+* Host-specific overrides
+Use one directory per host name, for example =hosts/tony-tm1701/=.
+
+Only put values that must differ between machines here, such as display
+layouts, host-only paths and local shell variables. Shared settings belong in
+the category directories. =shell/bashrc= and =shell/zshrc= source
+=hosts/$(hostname -s)/shell.sh= when it exists.
+
+System files such as =/etc/hosts= are not managed as home dotfiles. They belong
+in a separate system configuration workflow requiring sudo.

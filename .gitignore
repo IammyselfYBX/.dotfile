@@ -3,12 +3,19 @@ __pycache__/
 *.py[cod]
 .DS_Store
 
+# Logs and temporary files
+nohup.out
+*.log
+*.tmp
+*.swp
+*.bak*
+
 # Generated Rime data
-rime/build/
-rime/sync/
-rime/*.userdb/
-rime/*.userdb.old/
-rime/*.userdb.txt
-rime/*.lock
-rime/user.yaml
-rime/backup-*/
+input-method/rime/build/
+input-method/rime/sync/
+input-method/rime/*.userdb/
+input-method/rime/*.userdb.old/
+input-method/rime/*.userdb.txt
+input-method/rime/*.lock
+input-method/rime/user.yaml
+input-method/rime/backup-*/

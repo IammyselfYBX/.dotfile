@@ -1,0 +1,2 @@
+Place Ranger-specific icon assets here. Nerd Font glyphs are provided by the
+families under =assets/fonts/=.

@@ -1,0 +1,2 @@
+* Themes
+Shared GTK, Qt and terminal themes are grouped here by toolkit.

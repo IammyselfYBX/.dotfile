@@ -1,0 +1,1 @@
+Place Polybar-specific icons or image assets here.

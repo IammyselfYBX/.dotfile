@@ -1,0 +1,22 @@
+[user]
+	email = 5369081+iammyself001@user.noreply.gitee.com
+	name = Iammyself001
+[core]
+	compression = 0
+[http]
+	postBuffer = 5242880
+	lowSpeedLimit = 0
+	lowSpeedTime = 999999
+	sslBackend = openssl
+[sendpack]
+	sideband = false
+[merge]
+	tool = vimdiff
+	conflictStyle = diff3
+[mergetool]
+	prompt = false
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true

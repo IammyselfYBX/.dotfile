@@ -1,0 +1,3 @@
+* Icons
+Shared icon resources live here. Keep application-specific icon choices under
+the matching subdirectory. Do not replace the user's entire icon theme set.

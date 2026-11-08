@@ -1,56 +1,55 @@
-* Dotfiles 配置仓库
-本仓库统一管理个人 Linux 桌面配置。家目录中的配置文件通过软链接指向本仓库，因此直接修改家目录中的配置，实际修改的就是仓库文件。
+* Dotfiles
+This repository is the source of truth for portable user configuration.
+Computer-specific runtime data, caches, secrets and Vim stay outside this repo.
 
-** 安装与关联
+Vim is managed separately in =~/.vim= and is not linked or modified here.
+
+** Layout
+- =shell/=: Bash and Zsh configuration
+- =terminal/=: Alacritty, WezTerm and tmux
+- =desktop/=: i3, Compton, Polybar, autostart and Xorg
+- =input-method/=: Rime
+- =file-manager/=: Ranger
+- =documents/=: Zathura and LaTeX helper configuration
+- =editors/vscode/=: VS Code settings and snippets
+- =git/=: shared Git configuration
+- =assets/=: shared fonts, icons, wallpapers, images and themes
+- =hosts/<hostname>/=: machine-specific overrides
+- =packages/=: package and extension inventories
+- =scripts/=: integration helpers
+
+** First install
 #+begin_src bash
   git clone git@github.com:IammyselfYBX/.dotfile.git ~/.dotfile
   cd ~/.dotfile
   ./link.sh --dry-run
   ./link.sh
+  ./scripts/install-shell-entry.sh
+  ./scripts/install-git-include.sh
+  ./scripts/install-fonts.sh
 #+end_src
 
-=link.sh= 会在建立链接前把已有配置备份到 =~/.dotfile-backups/<时间戳>/=。
+=link.sh= backs up conflicting targets under =~/.dotfile-backups/<timestamp>/=.
+Application directories are symlinked. Existing shell startup files are preserved
+and receive a managed source block instead of being replaced.
 
-** 配置目录
-| 目录 | 内容 | 说明 |
-|------+------+------|
-| =i3/= | i3、Polybar 启动、截图、双屏、锁屏 | [[file:i3/README.md][i3 文档]] |
-| =alacritty/= | Alacritty 终端配置 | [[file:alacritty/README.md][Alacritty 文档]] |
-| =compton/= | Compton 窗口合成器配置 | [[file:compton/README.md][Compton 文档]] |
-| =gnome/= | GNOME/Qt Creator 桌面启动器 | [[file:gnome/README.md][桌面图标文档]] |
-| =latexmk/= | LaTeX 编译与语法检查 | [[file:latexmk/README.md][latexmk 文档]] |
-| =ranger/= | Ranger 文件管理器 | [[file:ranger/README.md][Ranger 文档]] |
-| =rime/= | IBus Rime 输入法 | [[file:rime/README.md][Rime 文档]] |
-| =xorg/= | Xmodmap 和 Xprofile | [[file:xorg/README.md][Xorg 文档]] |
-| =zathura/= | Zathura PDF 阅读器 | [[file:zathura/README.md][Zathura 文档]] |
-
-** 同步配置
-首次使用或切换电脑时先拉取：
-#+begin_src bash
-  cd ~/.dotfile
-  git pull --ff-only
+** Shell integration
+Existing =.bashrc=, =.zshrc=, =.bash_profile= and =.profile= files can remain
+machine-owned. The integration script adds:
+#+begin_src sh
+  if [ -f "$HOME/.dotfile/shell/bashrc" ]; then
+      . "$HOME/.dotfile/shell/bashrc"
+  fi
 #+end_src
 
-修改配置后提交并推送：
-#+begin_src bash
-  cd ~/.dotfile
-  git add -A
-  git commit -m "Update dotfiles"
-  git push
-#+end_src
+Git uses an include block in =~/.gitconfig= so machine-specific identity settings
+can coexist with =git/gitconfig=.
 
-** 生成文件
-以下内容属于运行时数据，不进入版本管理：
-- =rime/build/=
-- =rime/sync/=
-- Rime 的 =*.userdb= 数据
-- Python =__pycache__=
+** Assets
+Shared wallpapers and fonts live under =assets/=. i3 and WezTerm reference the
+shared paths directly. Font families are linked into =~/.local/share/fonts/=
+without replacing unrelated fonts.
 
-** 系统安装参考
-*** Arch
-- [[https://mp.weixin.qq.com/s/oWpgYLdgXJH7D8in1bL9ww][Arch 基础安装]]
-- [[https://mp.weixin.qq.com/s/jXAvERqApp0dbVgtre9xNw][i3wm 简单安装]]
-- [[https://mp.weixin.qq.com/s/V25aM-aQCsG5jaXA6nzqRw][Arch 桌面环境必要安装]]
-
-*** Gentoo
-- [[https://www.bilibili.com/video/BV1ny4y1i7G6/][安装系统与软件]]
+** Host-specific settings
+Host overrides live in =hosts/$(hostname -s)/=. System files such as =/etc/hosts=
+are handled separately with sudo and are not symlinked from the home directory.

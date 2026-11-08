@@ -1,0 +1,9 @@
+# Zsh configuration managed by ~/.dotfile.
+# Machine-specific zsh initialization remains in ~/.zshrc.
+
+# Load machine-specific shell settings when present.
+_dotfile_host="$(hostname -s 2>/dev/null || true)"
+if [ -n "$_dotfile_host" ] && [ -r "$HOME/.dotfile/hosts/$_dotfile_host/shell.sh" ]; then
+    . "$HOME/.dotfile/hosts/$_dotfile_host/shell.sh"
+fi
+unset _dotfile_host

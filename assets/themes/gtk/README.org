@@ -1,0 +1,1 @@
+Place GTK theme configuration or shared assets here.

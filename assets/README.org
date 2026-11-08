@@ -1,0 +1,16 @@
+* Shared assets
+This directory stores resources shared by multiple applications.
+
+** Layout
+- =fonts/=: font families used by terminals, editors and file managers
+- =icons/=: desktop, Polybar and file-manager icon resources
+- =wallpapers/=: i3, lock-screen and desktop wallpapers
+- =images/=: miscellaneous images
+- =themes/=: GTK/Qt/terminal themes
+
+Application-specific configuration stays under =terminal/=, =desktop/=,
+=file-manager/= and other category directories. Applications should reference
+these shared files rather than keeping duplicate copies.
+
+=scripts/install-fonts.sh= links each font family into
+=~/.local/share/fonts/= without replacing unrelated installed fonts.
