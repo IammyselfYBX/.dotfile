@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 import curses
 import datetime as _dt
+import difflib
 import json
 import locale
 import os
@@ -94,6 +95,10 @@ LINK_SPECS = [
     ("desktop-autostart", "Desktop", "桌面自启动项", "desktop/autostart", ".config/autostart"),
     ("input-rime", "Input", "Rime 输入法", "input-method/rime", ".config/ibus/rime"),
     ("file-ranger", "Files", "Ranger 文件管理器", "file-manager/ranger", ".config/ranger"),
+    ("i3-screen-off", "i3 Tools", "screen_off 命令", "desktop/i3/brightness/screen_off.sh", ".local/bin/screen_off"),
+    ("i3-betterlockscreen", "i3 Tools", "betterlockscreen 命令", "desktop/i3/lock/betterlockscreen", ".local/bin/betterlockscreen"),
+    ("i3-lock-screen", "i3 Tools", "锁屏命令", "desktop/i3/lock/lock-screen.sh", ".local/bin/lock-screen"),
+    ("i3-display-position", "i3 Tools", "显示器位置命令", "desktop/i3/display-position/i3-display-position", ".local/bin/i3-display-position"),
     ("doc-zathura", "Documents", "Zathura PDF", "documents/zathura/zathurarc", ".config/zathura/zathurarc"),
     ("doc-latexmk", "Documents", "latexmk", "documents/latexmk/latexmkrc", ".latexmkrc"),
     ("editor-vscode-settings", "Editor", "VS Code 设置", "editors/vscode/settings.json", ".config/Code/User/settings.json"),
@@ -160,6 +165,109 @@ def read_text(path: Path) -> str:
         return path.read_text(encoding="utf-8", errors="replace")
     except OSError:
         return ""
+
+
+def _effective_compare_path(path: Path) -> Path:
+    if path.is_symlink():
+        try:
+            return path.resolve(strict=True)
+        except OSError:
+            return path
+    return path
+
+
+def _is_text_file(path: Path, limit: int = 1_500_000) -> bool:
+    try:
+        if not path.is_file() or path.stat().st_size > limit:
+            return False
+        data = path.read_bytes()
+    except OSError:
+        return False
+    if b"\0" in data[:4096]:
+        return False
+    try:
+        data.decode("utf-8")
+        return True
+    except UnicodeDecodeError:
+        return False
+
+
+def _file_diff(source: Path, target: Path, rel: str = "") -> list[str]:
+    label = rel or target.name
+    if not _is_text_file(source) or not _is_text_file(target):
+        try:
+            same = source.read_bytes() == target.read_bytes()
+        except OSError:
+            same = False
+        return [f"二进制文件有差异: {label}"] if not same else []
+
+    source_text = source.read_text(encoding="utf-8", errors="replace").splitlines()
+    target_text = target.read_text(encoding="utf-8", errors="replace").splitlines()
+    if source_text == target_text:
+        return []
+    return list(
+        difflib.unified_diff(
+            target_text,
+            source_text,
+            fromfile=f"target/{label}",
+            tofile=f"source/{label}",
+            lineterm="",
+        )
+    )
+
+
+def _directory_files(root: Path) -> dict[str, Path]:
+    result: dict[str, Path] = {}
+    if not root.is_dir():
+        return result
+    for dirpath, dirnames, filenames in os.walk(root, followlinks=False):
+        dirnames[:] = sorted(d for d in dirnames if d not in (".git", "__pycache__"))
+        for name in sorted(filenames):
+            path = Path(dirpath) / name
+            try:
+                result[str(path.relative_to(root))] = path
+            except ValueError:
+                continue
+    return result
+
+
+def build_diff(item: Item) -> list[str]:
+    source = item.source
+    target = item.target
+    if not source.exists() and not source.is_symlink():
+        return [f"源文件缺失: {source}"]
+    if not lexists(target):
+        return [f"目标不存在: {target}", "", "安装后会在此路径建立受管理配置。"]
+
+    target_cmp = _effective_compare_path(target)
+
+    if source.is_dir():
+        if not target_cmp.is_dir():
+            return [f"类型不同: 源是目录，目标是 {target_cmp}"]
+        source_files = _directory_files(source)
+        target_files = _directory_files(target_cmp)
+        lines: list[str] = []
+        all_names = sorted(set(source_files) | set(target_files))
+        for rel in all_names:
+            if rel not in target_files:
+                lines.append(f"只存在于源: {rel}")
+                continue
+            if rel not in source_files:
+                lines.append(f"只存在于目标: {rel}")
+                continue
+            if source_files[rel].read_bytes() == target_files[rel].read_bytes():
+                continue
+            lines.extend(_file_diff(source_files[rel], target_files[rel], rel))
+            lines.append("")
+            if len(lines) > 3500:
+                lines.append("… 差异过大，已截断")
+                break
+        return lines or ["没有发现文件差异。"]
+
+    if target_cmp.is_dir():
+        return [f"类型不同: 源是文件，目标是目录 {target_cmp}"]
+    lines = _file_diff(source, target_cmp)
+    return lines or ["没有发现文件差异。"]
 
 
 def get_status(item: Item) -> Status:
@@ -253,49 +361,53 @@ def git_block(source: Path) -> str:
     )
 
 
-def integrate_adapter(item: Item, stamp: str) -> tuple[bool, str]:
+def integrate_adapter(item: Item, stamp: str, overwrite: bool = False) -> tuple[bool, str]:
     source = item.source
     target = item.target
     if not source.exists() and not source.is_symlink():
         raise RuntimeError(f"源文件缺失: {source}")
 
     old = read_text(target)
-    if item.marker and item.marker in old:
-        return False, "已集成，无需操作。"
-    if symlink_points_to(target, source):
-        return False, "已通过软链接安装，无需追加集成块。"
+    if not overwrite:
+        if item.marker and item.marker in old:
+            return False, "已集成，无需操作。"
+        if symlink_points_to(target, source):
+            return False, "已通过软链接安装，无需追加集成块。"
 
     backup_msg = ""
     if lexists(target):
         if target.is_dir():
             raise RuntimeError(f"目标是目录，无法作为配置文件集成: {target}")
-        if target.is_symlink():
+        if overwrite or target.is_symlink():
             backup = move_to_backup(target, stamp)
-            backup_msg = f"\n原软链接已备份到: {backup}"
+            backup_msg = f"\n原目标已备份到: {backup}"
         else:
             backup = copy_to_backup(target, stamp)
             backup_msg = f"\n原文件已备份到: {backup}"
 
     target.parent.mkdir(parents=True, exist_ok=True)
     prefix = ""
-    if target.is_file() and target.stat().st_size > 0:
+    if overwrite:
+        target.write_text("# Managed by ~/.dotfile.\n", encoding="utf-8")
+    elif target.is_file() and target.stat().st_size > 0:
         existing = read_text(target)
         if existing and not existing.endswith("\n"):
             prefix = "\n"
     block = git_block(source) if item.kind == "git" else shell_block(item.source_rel)
     with target.open("a", encoding="utf-8") as fh:
         fh.write(prefix + block)
-    return True, f"已集成: {target}{backup_msg}"
+    action = "已覆盖为受管理配置" if overwrite else "已集成"
+    return True, f"{action}: {target}{backup_msg}"
 
 
-def install_one(item: Item) -> tuple[bool, str]:
+def install_one(item: Item, overwrite: bool = False) -> tuple[bool, str]:
     stamp = make_stamp()
     if item.kind == "link":
         changed, msg = install_link(item, stamp)
         if changed and item.category == "Fonts" and shutil.which("fc-cache"):
             subprocess.run(["fc-cache", "-f"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         return changed, msg
-    return integrate_adapter(item, stamp)
+    return integrate_adapter(item, stamp, overwrite=overwrite)
 
 
 def run_bootstrap() -> tuple[bool, str]:
@@ -471,7 +583,7 @@ class DotfilesTUI:
             message_attr = self.pair(PAIR_GREEN if self.message_ok else PAIR_RED) | curses.A_BOLD
             self.addstr(height - 3, 2, clip_text(self.message, max(0, width - 4)), message_attr)
 
-        footer = "↑/↓ 移动   Enter 详情   i 安装/修复   a 全部安装   r 刷新   q/ESC 退出"
+        footer = "↑/↓ 移动  Enter 详情  i 安装/合并  d 差异  o 覆盖  a 全部安装  r 刷新  q/ESC 退出"
         self.addstr(height - 1, 1, clip_text(footer, max(0, width - 2)), self.pair(PAIR_GRAY))
         self.stdscr.refresh()
 
@@ -521,13 +633,20 @@ class DotfilesTUI:
 
     def detail_body(self, item: Item, status: Status) -> str:
         if status.code == STATUS_INSTALLED:
-            action = "已安装，无需操作。"
+            action = "已安装。按 d 可查看源与当前目标之间的差异。"
         elif status.code == STATUS_SOURCE:
             action = "源文件缺失，请先修复仓库内容。"
         elif item.kind == "link":
-            action = "按 i 安装。目标已存在时会先备份到 ~/.dotfile-backups/。"
+            action = (
+                "按 i 接管为软链接；按 o 强制覆盖为软链接；按 d 查看源与现有目标的差异。\n"
+                "发生冲突时，旧目标会先备份到 ~/.dotfile-backups/。"
+            )
         else:
-            action = "按 i 集成。已有文件会保留，并在末尾追加受管理块；修改前会先备份。"
+            action = (
+                "按 i 合并：保留原内容并在末尾追加受管理块；\n"
+                "按 o 覆盖：备份原文件后替换为受管理 shim；\n"
+                "按 d 查看当前目标与仓库配置的差异。"
+            )
 
         actual = ""
         if item.target.is_symlink():
@@ -563,7 +682,7 @@ class DotfilesTUI:
                     break
                 self.addstr(y, 2, line, self.pair(PAIR_GRAY))
                 y += 1
-            footer = "i 安装/修复   a 全部安装   ESC 返回"
+            footer = "i 安装/合并   o 覆盖   d 差异   a 全部安装   ESC 返回"
             self.addstr(height - 1, 1, clip_text(footer, max(0, width - 2)), self.pair(PAIR_GRAY))
             self.stdscr.refresh()
             ch = self.stdscr.getch()
@@ -571,12 +690,16 @@ class DotfilesTUI:
                 return
             if ch in (ord("i"), ord("I")):
                 self.install_selected(item)
+            elif ch in (ord("o"), ord("O")):
+                self.install_selected(item, overwrite=True)
+            elif ch in (ord("d"), ord("D")):
+                self.show_diff(item)
             elif ch in (ord("a"), ord("A")):
                 self.install_all()
 
-    def install_selected(self, item: Item) -> None:
+    def install_selected(self, item: Item, overwrite: bool = False) -> None:
         status = get_status(item)
-        if status.code == STATUS_INSTALLED:
+        if status.code == STATUS_INSTALLED and not overwrite:
             self.message = f"{item.name}: 已安装"
             self.message_ok = True
             return
@@ -584,22 +707,70 @@ class DotfilesTUI:
             self.message = f"{item.name}: 源文件缺失，无法安装"
             self.message_ok = False
             return
-        if item.kind == "link" and status.code == STATUS_CONFLICT:
-            prompt = "目标已存在，将备份后创建软链接。继续吗？"
+        if overwrite:
+            if item.kind == "link":
+                prompt = "将备份现有目标并覆盖为受管理软链接。继续吗？"
+            else:
+                prompt = "将备份现有文件并覆盖为受管理 shim。原内容不会自动合并。继续吗？"
+            title = f"覆盖 {item.name}"
+        elif item.kind == "link" and status.code == STATUS_CONFLICT:
+            prompt = "目标已存在，将备份后接管为受管理软链接。继续吗？"
+            title = f"接管 {item.name}"
         elif item.kind != "link" and status.code == STATUS_CONFLICT:
             prompt = "目标已存在，将保留原内容并追加受管理块。继续吗？"
+            title = f"合并 {item.name}"
         else:
             prompt = "确认安装这个配置吗？"
-        if not self.confirm(f"安装 {item.name}", prompt):
+            title = f"安装 {item.name}"
+        if not self.confirm(title, prompt):
             return
         try:
-            changed, msg = install_one(item)
+            changed, msg = install_one(item, overwrite=overwrite)
             self.message = msg.replace("\n", " ")
             self.message_ok = changed
         except Exception as exc:
             self.message = f"安装失败: {exc}"
             self.message_ok = False
         self.refresh()
+
+    def show_diff(self, item: Item) -> None:
+        lines = build_diff(item)
+        offset = 0
+        while True:
+            self.stdscr.erase()
+            height, width = self.stdscr.getmaxyx()
+            title = f"差异: {item.category} / {item.name}"
+            self.addstr(0, 2, clip_text(title, max(0, width - 4)), self.pair(PAIR_CYAN) | curses.A_BOLD)
+            self.addstr(1, 2, clip_text(f"{item.target}  <->  {item.source}", max(0, width - 4)), self.pair(PAIR_GRAY))
+            self.addstr(2, 0, "─" * max(1, width - 1), self.pair(PAIR_GRAY))
+            visible = max(1, height - 5)
+            offset = max(0, min(offset, max(0, len(lines) - visible)))
+            for row, line in enumerate(lines[offset : offset + visible], 3):
+                if line.startswith("+++") or line.startswith("---"):
+                    attr = self.pair(PAIR_CYAN) | curses.A_BOLD
+                elif line.startswith("+"):
+                    attr = self.pair(PAIR_GREEN)
+                elif line.startswith("-"):
+                    attr = self.pair(PAIR_RED)
+                elif line.startswith("@@"):
+                    attr = self.pair(PAIR_MAGENTA) | curses.A_BOLD
+                else:
+                    attr = self.pair(PAIR_GRAY)
+                self.addstr(row, 1, clip_text(line, max(0, width - 2)), attr)
+            footer = "↑/↓ 滚动   PgUp/PgDn 翻页   ESC/q 返回"
+            self.addstr(height - 1, 1, clip_text(footer, max(0, width - 2)), self.pair(PAIR_GRAY))
+            self.stdscr.refresh()
+            ch = self.stdscr.getch()
+            if ch in (27, ord("q"), ord("Q"), curses.KEY_LEFT):
+                return
+            if ch in (curses.KEY_UP, ord("k")):
+                offset = max(0, offset - 1)
+            elif ch in (curses.KEY_DOWN, ord("j")):
+                offset = min(max(0, len(lines) - visible), offset + 1)
+            elif ch == curses.KEY_PPAGE:
+                offset = max(0, offset - visible)
+            elif ch == curses.KEY_NPAGE:
+                offset = min(max(0, len(lines) - visible), offset + visible)
 
     def install_all(self) -> None:
         if not self.confirm("全部安装", "将执行 bootstrap.sh，可能会备份并替换冲突项。继续吗？"):
@@ -640,6 +811,14 @@ class DotfilesTUI:
                 item = self.selected_item()
                 if item:
                     self.install_selected(item)
+            elif ch in (ord("o"), ord("O")):
+                item = self.selected_item()
+                if item:
+                    self.install_selected(item, overwrite=True)
+            elif ch in (ord("d"), ord("D")):
+                item = self.selected_item()
+                if item:
+                    self.show_diff(item)
             elif ch in (ord("a"), ord("A")):
                 self.install_all()
             elif ch in (ord("r"), ord("R"), curses.KEY_RESIZE):

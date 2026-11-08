@@ -13,7 +13,6 @@
 | `display-position/` | 外接屏位置切换、监听、配置和说明 |
 | `brightness/` | 亮度调整辅助脚本 |
 | `lock/betterlockscreen` | 锁屏脚本 |
-| `install.sh` | 安装辅助命令到 `~/.local/bin` |
 
 ## 依赖
 
@@ -44,9 +43,7 @@ sudo apt install i3-wm i3status i3lock feh polybar alacritty maim slop \
 ## 安装与关联
 
 ```bash
-cd ~/.dotfile
-./link.sh
-./i3/install.sh
+~/.dotfile/scripts/dotctl
 ```
 
 确认 `~/.local/bin` 已加入 `PATH`：
@@ -169,7 +166,7 @@ i3-display-position apply   # 重新应用当前配置
 如果命令不存在，先重新执行安装脚本：
 
 ```bash
-~/.dotfile/desktop/i3/install.sh
+~/.dotfile/scripts/dotctl
 ```
 
 完整说明见 [`display-position/README.md`](display-position/README.md)。
@@ -214,7 +211,7 @@ xrandr --output HDMI-1 --off
 
 手动锁屏后，屏幕保持点亮 1 分钟；如果仍未解锁，则自动熄屏。解锁后重新恢复“不自动熄屏”状态。
 
-锁屏脚本的源文件位于 `~/.config/i3/lock/lock-screen.sh`，`install.sh` 会将它链接到 `~/.local/bin/lock-screen`。
+锁屏脚本的源文件位于 `~/.config/i3/lock/lock-screen.sh`，`dotctl` 会将它链接到 `~/.local/bin/lock-screen`。
 
 ```bash
 # 手动锁屏，快捷键 Mod+L

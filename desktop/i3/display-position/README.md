@@ -9,7 +9,6 @@
 | `i3-display-position` | 命令行和 dmenu 切换工具 |
 | `dual-display.sh` | 监听 HDMI 插拔并自动应用位置 |
 | `dual-display.conf` | 显示器名称和位置配置 |
-| `install.sh` | 把命令安装到 `~/.local/bin` |
 
 ## 依赖
 
@@ -30,8 +29,7 @@ sudo apt install i3-wm x11-xserver-utils feh dmenu
 ## 安装
 
 ```bash
-cd ~/.config/i3/display-position
-./install.sh
+~/.dotfile/scripts/dotctl
 ```
 
 确认 `~/.local/bin` 在 `PATH` 中：
@@ -43,7 +41,7 @@ export PATH="$HOME/.local/bin:$PATH"
 也可以在 `~/.dotfile/desktop/i3/` 中统一安装 i3 辅助命令：
 
 ```bash
-~/.dotfile/desktop/i3/install.sh
+~/.dotfile/scripts/dotctl
 ```
 
 ## i3 启动配置
@@ -130,9 +128,7 @@ Mod + Shift + D
 然后修改 `dual-display.conf` 中的输出名称，并运行：
 
 ```bash
-chmod +x ~/.config/i3/display-position/i3-display-position \
-  ~/.config/i3/display-position/dual-display.sh
-~/.config/i3/display-position/install.sh
+~/.dotfile/scripts/dotctl
 ```
 
 ## 排查

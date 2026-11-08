@@ -11,3 +11,8 @@ Run:
   ./dotctl --check
   ./dotctl --install-all
 #+end_src
+
+
+=dotctl= also manages the i3 helper commands previously installed by the
+removed i3 =install.sh= scripts. Conflict items can be inspected with =d= and
+overwritten with =o= after an automatic backup.
